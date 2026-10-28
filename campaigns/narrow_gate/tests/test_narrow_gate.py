@@ -231,10 +231,10 @@ FLOW = """
 local lead = M.player("Geoff", "Enfield 1-1", TX - 30000, TZ - 30000, 225)
 local wing = M.player("Wing", "Enfield 1-2", TX - 31000, TZ - 30500, 225)
 M.advance(TOT - 900)
-M.cmds["JTAC Pontiac/1. Check in"]()
+M.cmds["Pontiac (CAS)/1. Check in"]()
 M.advance(TOT - 890)
-M.cmds["JTAC Pontiac/2. Ready to copy 9-line"]()
-M.cmds["JTAC Pontiac/3. Read back 4, 6, restrictions"]()
+M.cmds["Pontiac (CAS)/2. Ready to copy 9-line"]()
+M.cmds["Pontiac (CAS)/3. Read back 4, 6, restrictions"]()
 M.advance(TOT - 880)
 """
 
@@ -283,10 +283,10 @@ run("ABORTS + uncleared drop", """
 local lead = M.player("Geoff", "Enfield 1-1", TX - 10000, TZ - 14000, 54)
 M.advance(TOT - 300)
 M.cmds["Enfield 1-1/IN (heading auto)"]()
-M.cmds["JTAC Pontiac/1. Check in"]()
+M.cmds["Pontiac (CAS)/1. Check in"]()
 M.advance(TOT - 290)
-M.cmds["JTAC Pontiac/2. Ready to copy 9-line"]()
-M.cmds["JTAC Pontiac/3. Read back 4, 6, restrictions"]()
+M.cmds["Pontiac (CAS)/2. Ready to copy 9-line"]()
+M.cmds["Pontiac (CAS)/3. Read back 4, 6, restrictions"]()
 M.advance(TOT - 280)
 M.cmds["Enfield 1-1/IN (heading auto)"]()            -- too early
 lead.hdg = 140
@@ -339,7 +339,7 @@ def chk5(L, M):
     assert M.smoke == 1
 run("LASER shift/stop, smoke, AAM ignored, time check", FLOW + """
 local lead = M.units["Enfield 1-1"]
-M.cmds["JTAC Pontiac/Request mark (red smoke)"]()
+M.cmds["Pontiac (CAS)/Request mark (red smoke)"]()
 M.cmds["Strike/Time check"]()
 local aam = M.bomb(TX, TZ, 3, Weapon.Category.MISSILE)
 aam.getDesc = function() return { category = 1, missileCategory = 1 } end

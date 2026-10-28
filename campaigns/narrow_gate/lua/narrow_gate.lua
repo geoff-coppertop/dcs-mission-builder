@@ -1,5 +1,5 @@
 -- Operation Narrow Gate
--- FORD jamming window, Gudauta patrol, CAP relief, standard JTAC/CAS flow (Type 2), TOT grading, late scramble,
+-- FORD jamming window, Gudauta patrol, CAP relief, standard CAS flow (Type 2) with PONTIAC, TOT grading, late scramble,
 -- on-call CAP commit, recovery debrief. Pure DCS scripting engine (no MIST/MOOSE).
 
 TOTS = TOTS or {}
@@ -972,7 +972,7 @@ function T.init()
 
   at(C.TOT - 600, function()
     msg("MAGIC: Enfield, package check. TOT " .. clock(C.TOT) .. " in 10 minutes." ..
-        (S.checkedIn and "" or "\nPONTIAC is up for check-in: F10 > Strike > JTAC Pontiac."), 15)
+        (S.checkedIn and "" or "\nPONTIAC is up for check-in: F10 > Strike > Pontiac (CAS)."), 15)
   end)
   at(C.FORD_SPAWN, function()
     S.fordUp = true
@@ -995,7 +995,7 @@ function T.init()
   local root = missionCommands.addSubMenuForCoalition(BLUE, "Strike")
   missionCommands.addCommandForCoalition(BLUE, "Time check", root, T.timeCheck)
   missionCommands.addCommandForCoalition(BLUE, "Request CAP cover", root, T.requestCAP)
-  local jm = missionCommands.addSubMenuForCoalition(BLUE, "JTAC Pontiac", root)
+  local jm = missionCommands.addSubMenuForCoalition(BLUE, "Pontiac (CAS)", root)
   missionCommands.addCommandForCoalition(BLUE, "1. Check in", jm, T.checkIn)
   missionCommands.addCommandForCoalition(BLUE, "2. Ready to copy 9-line", jm, T.nineLine)
   missionCommands.addCommandForCoalition(BLUE, "3. Read back 4, 6, restrictions", jm, T.readBack)
@@ -1011,7 +1011,7 @@ function T.init()
   end
 
   msg("OPERATION NARROW GATE. TOT " .. clock(C.TOT) .. ", impact window +/-" .. C.WINDOW ..
-      " s, jamming " .. hms(SUP_ON) .. "-" .. hms(SUP_OFF) .. "L. F10 > Strike for time checks, CAP and JTAC Pontiac.", 20)
+      " s, jamming " .. hms(SUP_ON) .. "-" .. hms(SUP_OFF) .. "L. F10 > Strike for time checks, CAP and Pontiac (CAS).", 20)
 end
 
 T.init()

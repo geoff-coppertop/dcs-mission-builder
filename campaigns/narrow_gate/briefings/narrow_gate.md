@@ -161,7 +161,7 @@ Cold start on the deck. Use fast (CV) alignment and allow about 15 minutes to th
 | ENFIELD 1-1, 1-2 | You | 251.0 AM | Flight frequency, shared with ARCO |
 | ARCO | S-3B tanker, 15,000 ft on the egress track | 251.0 AM | TACAN 60Y |
 | MAGIC | E-2C, controls CHEVY and UZI | 255.0 AM | |
-| PONTIAC | JTAC, MQ-9 over the target | F10 menu | Laser 1688 |
+| PONTIAC | MQ-9 over the target: passes the Blue ground commander's 9-line and clearances, and lases | F10 menu | Laser 1688 |
 | FORD | 2× F/A-18C jamming package, transiting north at 25,000 ft | Text calls | Jamming {{ jam_on }}–{{ jam_off }} |
 | CHEVY | 2× F/A-18C CAP, 20,000 ft | MAGIC commits | Station about 23 nm SW of EGRESS |
 | UZI | 2× F/A-18C alert-5 on Mother | Via MAGIC | About {{ alert_min }} min to the CAP station |
@@ -176,15 +176,15 @@ Both jets: 4× GBU-12 (two BRU-33s), LITENING, 2× AIM-9X, 3× AIM-120C, centrel
 |---|---|
 | Time check | Time, TOT and time remaining, jamming and impact windows, check-in, 9-line and readback status |
 | Request CAP cover | Asks MAGIC for the CAP over EGRESS, about 3–4 minutes away. Approved only if the CAP is free |
-| JTAC Pontiac > 1. Check in | Your check-in; PONTIAC answers with the situation and game plan |
-| JTAC Pontiac > 2. Ready to copy 9-line | The 9-line with live coordinates and elevation, plus remarks |
-| JTAC Pontiac > 3. Read back | Lines 4 and 6 and restrictions. Required before any clearance |
-| JTAC Pontiac > Request mark | Red smoke 30 m north of the current target |
-| JTAC Pontiac > Enfield 1-x > IN | Sends your heading: CLEARED HOT, or ABORT with the reason |
-| JTAC Pontiac > Enfield 1-x > Ten seconds | PONTIAC turns the laser on |
-| JTAC Pontiac > Enfield 1-x > Spot | You confirm the spot |
-| JTAC Pontiac > Enfield 1-x > OFF | Off target; BDA once your weapons land |
-| JTAC Pontiac > Enfield 1-x > Terminate | Laser off |
+| Pontiac (CAS) > 1. Check in | Your check-in; PONTIAC answers with the situation and game plan |
+| Pontiac (CAS) > 2. Ready to copy 9-line | The 9-line with live coordinates and elevation, plus remarks |
+| Pontiac (CAS) > 3. Read back | Lines 4 and 6 and restrictions. Required before any clearance |
+| Pontiac (CAS) > Request mark | Red smoke 30 m north of the current target |
+| Pontiac (CAS) > Enfield 1-x > IN | Sends your heading: CLEARED HOT, or ABORT with the reason |
+| Pontiac (CAS) > Enfield 1-x > Ten seconds | PONTIAC turns the laser on |
+| Pontiac (CAS) > Enfield 1-x > Spot | You confirm the spot |
+| Pontiac (CAS) > Enfield 1-x > OFF | Off target; BDA once your weapons land |
+| Pontiac (CAS) > Enfield 1-x > Terminate | Laser off |
 | Mission summary now | Outcome on demand (automatic once every jet is down) |
 <!-- /task -->
 

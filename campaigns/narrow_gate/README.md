@@ -11,7 +11,7 @@ battalion's fuel depot, is your plan. CAG has promised you more of the air wing 
 
 | File | When you fly it | What it is |
 |---|---|---|
-| `Operation_Narrow_Gate.miz` | First | Dawn time-on-target strike on the depot, inside the window a transiting jamming package opens on the SA-6. Laser-guided bombs under JTAC control |
+| `Operation_Narrow_Gate.miz` | First | Dawn time-on-target strike on the depot, inside the window a transiting jamming package opens on the SA-6. Laser-guided bombs, cleared and lased by PONTIAC |
 | `Operation_Long_Road.miz` | Narrow Gate succeeded on time | Interdiction of the brigade's stalled column before it reaches cover, with COLT (AI HARM pair) assigned to you |
 | `Operation_Long_Road_Own_SEAD.miz` | The depot was destroyed, but late | The same interdiction without COLT: your section brings its own HARMs |
 | `Operation_Stone_Ford.miz` | Narrow Gate partly worked | Close air support for the bridgehead at Ganmukhuri against a weakened battalion, ground JTAC (Type 1) |

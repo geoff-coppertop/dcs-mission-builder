@@ -219,7 +219,7 @@ for pt, nm in [(FORD_E, "JAM ON"), (FORD_C, "CLOSEST"), (FORD_X, "JAM OFF"), (FO
     ford.add_waypoint(pt, 25000 * FT, FORD_MS * 3.6, name=nm)
 assert SAM.distance_to_point(FORD_C) > 25_000, "FORD must stay outside SA-6 reach"
 
-# JTAC drone: orbits the target, script lases on request
+# PONTIAC drone (controls for the Blue ground commander): orbits the target, script lases on request
 pontiac = m.flight_group_inflight(usa, "Pontiac", MQ_9_Reaper, TGT.point_from_heading(200, 6000),
                                   altitude=4500, speed=220, maintask=task.Reconnaissance)
 pontiac.units[0].name = "Pontiac"
