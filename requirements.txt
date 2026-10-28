@@ -1,0 +1,9 @@
+pydcs==1.0.0            # writes .miz files
+lupa>=2.0               # runs the mission Lua for tests and reads .miz contents
+matplotlib>=3.8         # maps and timelines
+numpy>=1.26
+global-land-mask>=1.0   # coastline for maps; land check for ground units
+mgrs>=1.4               # 9-line coordinates
+Jinja2>=3.1             # briefing placeholders
+Markdown>=3.5           # briefing Markdown -> HTML
+playwright>=1.40        # HTML -> PDF (run `playwright install chromium` once)
