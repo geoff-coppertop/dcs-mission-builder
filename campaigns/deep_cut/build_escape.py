@@ -52,8 +52,7 @@ def build():
     u.fuel = F14A.fuel_max
     # the ferry crew aligned the INS during yesterday's engine runs and the jet hasn't moved: stored heading is valid
     u.set_property("INSAlignmentStored", True)
-    u.set_property("TacanChannel", 74)                # HATCHET's one favour in the cockpit: Mother's TACAN, 74X
-    u.set_property("TacanBand", 0)
+    # no TACAN preset: a Red ferry jet has no reason to carry Mother's channel; the pilot dials 74X
     u.gun, u.chaff, u.flare = 100, 60, 30
     g.set_frequency(251.0)
     g.add_waypoint(fp.point_from_heading(270, 8000), 1500 * FT, 450 * KTS, name="RUN WEST")
