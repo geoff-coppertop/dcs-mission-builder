@@ -23,7 +23,8 @@ end
 local function now() return timer.getAbsTime() end
 local function d2(a, b) local dx, dz = a.x - b.x, a.z - b.z return math.sqrt(dx * dx + dz * dz) end
 
-local PRIORITY = { boat = 3, threat = 2, request = 1 }
+-- ident: an unknown jet the CAP must identify outranks a threat elsewhere; the boat still comes first
+local PRIORITY = { boat = 4, ident = 3, threat = 2, request = 1 }
 
 K.cap = nil            -- the CAP on station: { group, call, mode, task, relief, reliefCalled, reliefDue, wasPair }
 K.history = {}         -- one line per event, for the mission summary

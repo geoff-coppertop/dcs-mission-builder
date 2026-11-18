@@ -15,11 +15,13 @@ T.cfg = T.cfg or {
   FIELD = "Senaki-Kolkhi", FIELD_AD = { "Senaki Guns North", "Senaki Guns South", "Senaki SA-13" },
   SOUTH_GROUP = "Red South", SOUTH_KIND = "two MiG-29s", SOUTH_BASE = "Kutaisi",
   JET = "Enfield 1-1", OUTCOME_FLAG = "90",
-  CODE = "KESTREL", CARRIER = "CVN-74 Stennis", ID_R = 83340, VID_R = 3700, VID_S = 8, KEEP_CLEAR = 18520,
+  CODE = "KESTREL", CARRIER = "CVN-74 Stennis", ID_R = 83340, VID_R = 3700, VID_S = 8,
+  FLEET_WARN_R = 55560, FLEET_R = 37040, MISSILE_TOF = 20,
 }
 local C = T.cfg
 T.s = { found = nil, launched = nil, airborne = false, kills = 0, over = false,
-        authed = nil, unknown = nil, identified = nil, vid = 0, warned = 0, trapUnknown = false, waitSaid = nil }
+        authed = nil, unknown = nil, identified = nil, vid = 0, warned = 0, trapUnknown = false, waitSaid = nil,
+        missile = nil, fleetShot = false }
 local S = T.s
 
 function T.discover(why)
@@ -37,22 +39,46 @@ function T.discover(why)
 end
 
 ------------------------------------------------------------------ identification
+-- An unknown jet inbound from Red territory is a threat until it is identified. Checking in with MAGIC (code
+-- word) identifies it at once. Staying silent costs you: CHEVY's intercept (cap.lua kind "ident") outranks the
+-- MiGs, so the CAP is on you instead of on them; and inside FLEET_R of Mother an unidentified jet is engaged by
+-- the fleet.
 local LABEL = "the unknown Tomcat"
 local function known() return S.authed or S.identified end
 local function jet() local u = N.liveUnit(C.JET) return u and N.playerName(u) and u or nil end
 local function mother() local cv = N.liveUnit(C.CARRIER) return cv and cv:getPoint() end
+
+-- once the Tomcat is known, CHEVY comes off it: onto the MiGs if they're up, otherwise back to its station
+local function freeChevy()
+  local c = CAPCTL.cap
+  if not (c and c.mode == "committed" and c.task and c.task.label == LABEL) then return end
+  c.mode, c.task = nil, nil
+  CAPCTL.pending = nil
+  if S.launched and #N.liveUnits(C.SOUTH_GROUP) > 0 then
+    N.capThreat(C.SOUTH_KIND .. " off " .. C.SOUTH_BASE .. ", chasing Enfield")
+  else
+    local g = Group.getByName(c.group)
+    if g then pcall(function() g:getController():setTask(CAPCTL.airTask(CAPCFG.STATION, 40000)) end) end
+    N.msg("MAGIC: " .. CAPCTL.call() .. ", the Tomcat's friendly. Reset CAP station.", 10)
+  end
+end
 
 function T.checkIn()
   local u = jet()
   if not u or not S.airborne then N.msg("Nobody can hear you from the ground. Get airborne first.", 8) return end
   if S.authed then N.msg("MAGIC: You're authenticated already. Come home.", 8) return end
   S.authed = timer.getAbsTime()
+  if S.missile then
+    S.missile = nil
+    N.msg("MOTHER: ABORT, ABORT! " .. C.CODE .. " authenticates. Missiles destructed. That was close, Enfield.", 15)
+  end
   N.msg("MAGIC: Unknown Tomcat, authenticate. ... " .. C.CODE .. " is correct. Enfield, good to hear you.\n" ..
-        "You're friendly on our scope. Mother has you cleared in. Expect " .. CAPCTL.call() .. " to take a look on the way.", 20)
+        "You're friendly on our scope and Mother has you cleared in. " .. CAPCTL.call() .. " is free to work the MiGs.", 20)
+  freeChevy()
 end
 
 function T.commitIntercept(p)
-  CAPCTL.commit("request", { x = p.x, z = p.z }, LABEL, "unknown Tomcat inbound",
+  CAPCTL.commit("ident", { x = p.x, z = p.z }, LABEL, "unknown Tomcat inbound",
                 { clear = function() return known() and true or false end, timeout = 1800, radius = 30000 })
 end
 
@@ -67,30 +93,42 @@ local function steer(gname, p)
                  noTargetTypes = {}, priority = 0 } } } } } } } } } }) end)
 end
 
+local function fleetEngage()
+  S.missile = timer.getAbsTime()
+  N.msg("MOTHER: Unknown Tomcat inside " .. math.floor(C.FLEET_R / 1852 + 0.5) .. " nm, not answering. ENGAGING. Birds away.", 15)
+  timer.scheduleFunction(function()
+    if not S.missile or known() then return nil end
+    S.fleetShot = true
+    local u = jet()
+    if u then pcall(trigger.action.explosion, u:getPoint(), 150) end
+    N.msg("MOTHER: Splash one unknown Tomcat.", 15)
+    return nil
+  end, nil, timer.getTime() + C.MISSILE_TOF)
+end
+
 function T.idTick(_, t)
   if S.over then return nil end
   local u, cvp = jet(), mother()
-  if not u or not cvp then return t + 2 end
+  if not u or not cvp or not S.airborne or known() then return t + 2 end
+  local now = timer.getAbsTime()
   local p = u:getPoint()
-  if not S.unknown and not known() and S.airborne and N.dist(p, cvp) < C.ID_R then
-    S.unknown = timer.getAbsTime()
-    N.msg(string.format("MAGIC: Unknown Tomcat, %d nm east of Mother, inbound. Not squawking anything we know.\n" ..
-          "%s, intercept and identify. Weapons hold on the Tomcat.", math.floor(N.dist(p, cvp) / 1852 + 0.5), CAPCTL.call()), 20)
+  local d = N.dist(p, cvp)
+  if not S.unknown and d < C.ID_R then
+    S.unknown = now
+    N.msg(string.format("MAGIC: Unknown Tomcat, %d nm east of Mother, inbound. Not squawking anything we know. " ..
+          "Treating it as hostile until it's identified.\n%s, intercept and identify. Weapons hold on the Tomcat.",
+          math.floor(d / 1852 + 0.5), CAPCTL.call()), 15)
     T.commitIntercept(p)
   end
-  if S.unknown and not known() then
+  if S.unknown then
     local c = CAPCTL.cap
-    -- a higher-priority commit (the MiGs) drops the intercept in cap.lua: pick it up again once CHEVY is free
-    if c and not c.mode then
-      N.msg("MAGIC: " .. CAPCTL.call() .. ", back to the unknown Tomcat. Intercept and identify, weapons hold.", 12)
-      S.waitSaid = nil
-      T.commitIntercept(p)
-    elseif c and c.mode ~= "committed" or (c and c.task and c.task.label ~= LABEL) then
-      if S.waitSaid ~= (c and c.mode) then
-        S.waitSaid = c and c.mode
-        N.msg("MAGIC: Unknown Tomcat, " .. (c.mode == "out" and "there's nobody free to look at you" or
-              (CAPCTL.call() .. " is busy with the MiGs")) .. ". Stay outside 10 nm of Mother until you're identified, or authenticate.", 15)
+    if c and c.mode == "out" then
+      if not S.waitSaid then
+        S.waitSaid = true
+        N.msg("MAGIC: Unknown Tomcat, there's nobody free to come and look at you. Authenticate, or stay clear of the fleet.", 15)
       end
+    elseif c and (not c.mode or (c.task and c.task.label ~= LABEL and c.task.kind ~= "boat")) then
+      T.commitIntercept(p)     -- idle, or on the MiGs: the unknown outranks them
     end
     if c and c.mode == "committed" and c.task and c.task.label == LABEL then
       if (t % 10) < 2 then steer(c.group, p) end
@@ -100,15 +138,22 @@ function T.idTick(_, t)
       end
       S.vid = close and (S.vid + 2) or 0
       if S.vid >= C.VID_S then
-        S.identified = timer.getAbsTime()
+        S.identified = now
+        if S.missile then S.missile = nil; N.msg("MOTHER: ABORT, ABORT! Missiles destructed.", 10) end
         N.msg("CHEVY: Tally one Tomcat, foreign paint. Pilot's waving, he's holding up a kneeboard: ENFIELD. Looks like ours.\n" ..
               "MAGIC: Copy, declaring the Tomcat friendly. Mother has you cleared in.", 20)
+        freeChevy()
+        return t + 2
       end
     end
   end
-  if not known() and N.dist(p, cvp) < C.KEEP_CLEAR and timer.getAbsTime() - S.warned > 30 then
-    S.warned = timer.getAbsTime()
-    N.msg("MOTHER: Unidentified Tomcat, you are NOT cleared. Remain outside 10 nm until identified.", 10)
+  if not S.missile and not S.fleetShot then
+    if d < C.FLEET_R then fleetEngage()
+    elseif d < C.FLEET_WARN_R and now - S.warned > 30 then
+      S.warned = now
+      N.msg(string.format("MOTHER: Unknown Tomcat, you are approaching the fleet's missile zone. Identify yourself or turn away. " ..
+            "We engage inside %d nm.", math.floor(C.FLEET_R / 1852 + 0.5)), 10)
+    end
   end
   return t + 2
 end
@@ -156,7 +201,8 @@ function N.onAllDown()
     kind = N.rec.lossKind[p] or kind
   end
   local outcome, why
-  if home and not S.trapUnknown then outcome, why = "SUCCESS", "The pilot is home, in a jet Red had to watch leave."
+  if S.fleetShot then outcome, why = "FAILURE", "Shot down by our own fleet, silent and unidentified. The Navy fished you out; the Captain wants a word."
+  elseif home and not S.trapUnknown then outcome, why = "SUCCESS", "The pilot is home, in a jet Red had to watch leave."
   elseif home then outcome, why = "PARTIAL", "Home, but unannounced: an unidentified jet on the deck. Expect a long talk with the Captain."
   elseif kind == "water" then outcome, why = "PARTIAL", "Down over the water: the Navy picks the crew up. The jet is gone."
   else outcome, why = "FAILURE", "Down over Red territory again." end

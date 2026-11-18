@@ -100,31 +100,62 @@ M.event({ id = world.event.S_EVENT_LAND, initiator = JET, place = M.carrier() })
 """, c_intercept)
 
 
-def c_recommit(L, M, t, opts):
-    assert "break off the unknown Tomcat" in t and "Chevy is busy with the MiGs" in t
-    assert "back to the unknown Tomcat" in t and "Tally one Tomcat" in t
-run("MiGs pull CHEVY off; it comes back for the ID", """
+def c_silent(L, M, t, opts):
+    assert "Chevy is committed on the unknown Tomcat; no CAP for the coast until it resets" in t
+    assert "KESTREL is correct" in t and "free to work the MiGs" in t
+    assert t.count("commit. two MiG-29s off Kutaisi") == 1          # only once the Tomcat is known
+run("Silent: CHEVY stays on the unknown, the MiGs wait until you check in", """
 M.event({ id = world.event.S_EVENT_TAKEOFF, initiator = JET })
 M.advance(START + 30)
 JET.p = { x = -20000, y = 1500, z = -60000 }
-M.advance(START + REACT + 25)
-M.units["Red South 1"].alive = false; M.units["Red South 2"].alive = false
-M.advance(START + REACT + 25 + 75)
-M.units["Chevy 1-1"].p = { x = -20500, y = 1500, z = -61000 }
-M.advance(START + REACT + 25 + 95)
-""", c_recommit)
+M.advance(START + 20 + REACT + 10)
+M.cmds["Escape/Check in with MAGIC (KESTREL)"]()
+M.advance(START + 20 + REACT + 20)
+""", c_silent)
 
 
-def c_unknown_trap(L, M, t, opts):
-    assert "you are NOT cleared" in t and "trapped without clearance" in t
-    assert "OUTCOME: PARTIAL" in t and "Never identified" in t
-run("Trap without being identified", """
+def c_divert(L, M, t, opts):
+    assert "break off the coast. Divert: unknown Tomcat inbound" in t
+    assert "Tally one Tomcat" in t
+    assert t.count("commit. two MiG-29s off Kutaisi") == 2          # before the divert, and again after the ID
+run("MiGs first; the unknown pulls CHEVY off them; the ID sends it back", """
 M.event({ id = world.event.S_EVENT_TAKEOFF, initiator = JET })
-M.advance(START + 60)
-JET.p = { x = -20000, y = 1500, z = -112000 }
+M.advance(START + 20 + REACT + 10)
+JET.p = { x = -20000, y = 1500, z = -60000 }
+M.advance(START + 20 + REACT + 15)
+M.units["Chevy 1-1"].p = { x = -20500, y = 1500, z = -61000 }
+M.advance(START + 20 + REACT + 35)
+""", c_divert)
+
+
+def c_fleet(L, M, t, opts):
+    assert "approaching the fleet's missile zone" in t and "ENGAGING. Birds away" in t and "Splash one" in t
+    assert len(M.explosions) == 1
+    assert "OUTCOME: FAILURE" in t and "Shot down by our own fleet" in t and M.flags["90"] == 3
+run("Silent inside 20 nm: the fleet shoots", """
+M.waterFn = function() return true end
+M.event({ id = world.event.S_EVENT_TAKEOFF, initiator = JET })
+M.advance(START + 30)
+JET.p = { x = -20000, y = 1500, z = -70000 }
+M.advance(START + 40)
+JET.p = { x = -20000, y = 1500, z = -90000 }
+M.advance(START + 70)
+M.event({ id = world.event.S_EVENT_EJECTION, initiator = JET })
+""", c_fleet)
+
+
+def c_abort(L, M, t, opts):
+    assert "Birds away" in t and "ABORT, ABORT" in t and "Splash one" not in t and len(M.explosions) == 0
+    assert "OUTCOME: SUCCESS" in t
+run("Checking in with missiles in the air aborts them", """
+M.event({ id = world.event.S_EVENT_TAKEOFF, initiator = JET })
+M.advance(START + 30)
+JET.p = { x = -20000, y = 1500, z = -90000 }
+M.advance(START + 40)
+M.cmds["Escape/Check in with MAGIC (KESTREL)"]()
 M.advance(START + 70)
 M.event({ id = world.event.S_EVENT_LAND, initiator = JET, place = M.carrier() })
-""", c_unknown_trap)
+""", c_abort)
 
 
 def c_ground_call(L, M, t, opts):
