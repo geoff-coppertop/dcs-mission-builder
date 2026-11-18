@@ -1,8 +1,10 @@
-<div class="kicker">Mission briefing · Enfield 1-1 · Deep Cut, follow-up when a pilot is down over land</div>
+<div class="kicker">Player reference · not an operations order · Deep Cut follow-up when a pilot is down over land</div>
 
 # Operation Deep Cut: Escape
 
 F-14A Tomcat · 1 player, or 2 with a RIO · Caucasus · escape and evasion in a stolen jet · cold start at Senaki-Kolkhi, recovery aboard CVN-74
+
+<p class="small">Nobody briefs an escape. In the story, all you have is what HATCHET whispered to you on the ramp and what you remember. This sheet is for you, the player.</p>
 
 <div class="glance" markdown="1">
 
@@ -16,27 +18,31 @@ F-14A Tomcat · 1 player, or 2 with a RIO · Caucasus · escape and evasion in a
 </div>
 
 <!-- ingame -->
-## Situation
+## On the ramp
 
-You ejected over the gorge yesterday. HATCHET, the team on the ridge, reached you before Red did and moved you down the valley overnight. There's no helicopter coming this deep: the SAMs above the gorge are up and every valley has MANPADS in it. Instead HATCHET has brought you to Senaki-Kolkhi.
+*HATCHET, low, crouched by the nose gear, {{ start }}:*
 
-Red bought a handful of second-hand F-14As from an export customer, still in that customer's camouflage. Without a parts supply they barely fly, and this morning one is being ferried out to a depot for overhaul. It sits on the ramp fuelled for the trip with two tanks on and no weapons but the gun. The air start cart is hooked up for the ferry crew's start, which matters because the Tomcat has no APU and can't light its first engine without one.
+"That's your ride. It's theirs: one of the second-hand Tomcats they bought from an export customer. They can barely keep them flying, and this one's being ferried to a depot for overhaul this morning. So it's fuelled for the trip, two bags on, and the only weapon on it is the gun. Don't go looking for a fight.
 
-You can fly it because you've flown it before. You're the air wing commander, and twenty years ago, as a junior officer, you flew F-14Ds in one of the last Tomcat squadrons before the Navy retired the jet in 2006. It will feel familiar and rusty at the same time.
+"Their crew aligned it during engine runs yesterday and nobody's moved it since, so use the stored heading. A full alignment and you'll still be sitting here when the guards come round. The start cart's still hooked up for them. Good thing: no APU on these.
 
-After yesterday's raid the base is on alert. Guards are doubled, and HATCHET reckons someone will check the ferry jet about {{ discover_min }} minutes after you climb in, at **{{ discover }}**. If you're still on the ground then, the guns on the field open up.
+"Guards are doubled after what you lot did to the gorge. Someone checks this end at about **{{ discover }}**, so be rolling well before that. The moment you take off they'll know, and the guns on this field will open up: ZU-23s, a Shilka, an SA-13. Kutaisi has its alert at readiness. Figure two MiG-29s about a minute behind you.
+
+"Go west, low and fast, to the coast. The Navy knows someone's coming out in a Red Tomcat. It doesn't know when, or which blip is you. Once you're airborne, call MAGIC and give them **{{ code }}**. If you don't, the CAP will come and look at you before anyone lets you near the boat. Mother's TACAN is 74X. Their radios are set up for their flight, not yours.
+
+"You're heavy. Burn it or dump it before you try to land that thing on a carrier.
+
+"Twenty years since you flew one of these, they tell me. Go."
 
 ## Mission
 
 Start the Tomcat, get airborne and get home to Mother.
 
-## How it goes
+## How the game plays it
 
-- **Get moving.** It's a cold start, but the ferry crew aligned the INS during yesterday's engine runs and the jet hasn't moved since, so a **stored-heading alignment** is valid: about 3 minutes instead of 8, running while the engines spin up. A full alignment won't finish before the guards arrive. The radios and TACAN are set up for Red's ferry flight, not yours: dial Mother's TACAN, 74X, yourself. The jet is noticed {{ notice }} seconds after you take off, or when the guards arrive, whichever comes first, or at once if you fire the gun on the field. Once it is noticed, the field's ZU-23s, a ZSU-23-4 and an SA-13 open up.
-- **The chase.** Kutaisi's alert is sitting at readiness this morning: {{ react }} seconds after you're seen, two MiG-29s launch at you. Kutaisi is about 25 nm east of the field, so they start close behind you.
-- **The run.** Head west, low and fast, to FEET WET on the coast. MAGIC commits CHEVY, two Hornets on CAP off the coast, onto the MiGs once they launch. You have the gun and nothing else: speed and altitude are your defence, not a dogfight.
-- **Getting aboard.** Full fuel and two tanks. You'll be heavy for the trap: dump or burn down before you come aboard.
-- **Identification.** HATCHET passed word over its satellite radio last night: an escape is coming, in a Red Tomcat, code word **{{ code }}**. The Navy knows that much, not when or which radar contact is you. Your jet squawks nothing the Navy recognises. Once airborne, check in with MAGIC (**F10 > Escape > Check in with MAGIC**) and you're declared friendly. If you cross into the ID zone, {{ id_nm }} nm from Mother, without checking in, MAGIC sends CHEVY to intercept you and look before anyone declares you friendly. Mother won't clear an unidentified jet inside {{ clear_nm }} nm.
+- **Get moving.** The stored-heading alignment takes about 3 minutes and runs while the engines spin up; a full alignment (about 8) won't finish before the guards arrive. The jet is noticed {{ notice }} seconds after you take off, when the guards arrive, or at once if you fire the gun on the field.
+- **The chase.** {{ react }} seconds after you're seen, two MiG-29s launch from Kutaisi, about 25 nm east. MAGIC commits CHEVY, two Hornets on CAP off the coast, onto them.
+- **Identification.** Once you're airborne, F10 > Escape > Check in with MAGIC declares you friendly. If you cross into the ID zone ({{ id_nm }} nm from Mother) without checking in, CHEVY intercepts and has to get close enough to see you. Mother won't clear an unidentified jet inside {{ clear_nm }} nm.
 
 ## What happens next
 
@@ -83,6 +89,6 @@ F10 > Escape: **Status** (seen or not, identified or not, fighters, CAP), **Chec
 | {{ r.wp }} | {{ r.name if r.wp else "Senaki-Kolkhi (ramp)" }} | {{ r.coords }} | {{ r.alt if r.wp else "ramp" }} | {{ r.leg }} | {{ r.course }} |
 {% endfor %}
 
-<p class="small">Loadout: {{ load | reject("equalto", "—") | join(", ") }}, gun. MOTHER is the carrier's estimated position; trust TACAN 74X.</p>
+<p class="small">In the story you'd carry this route in your head; the game loads it into the jet's navigation system anyway. Loadout: {{ load | reject("equalto", "—") | join(", ") }}, gun. MOTHER is the carrier's estimated position; trust TACAN 74X.</p>
 
 </div>
