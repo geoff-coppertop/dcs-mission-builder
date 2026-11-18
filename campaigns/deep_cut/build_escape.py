@@ -20,7 +20,8 @@ from missionbuilder.paths import read_lua
 from missionbuilder.red_arms import arm
 
 START = datetime.datetime(2027, 1, 15, 8, 50, 0)     # the next morning, just after sunrise
-DISCOVER = 6 * 60                                    # guards reach the jet this long after start (base on alert)
+DISCOVER = 9 * 60                                    # guards reach the jet this long after start (base on alert):
+                                                     # a stored-heading start (~3 min align) plus taxi, with some margin
 ALERT_REACT = 60                                     # Kutaisi's alert is quick this morning
 COAST = (42.200, 41.640)                             # feet wet, south of the Enguri mouth
 
@@ -49,6 +50,10 @@ def build():
     for st, store in {3: F14A.Pylon3.Fuel_tank_300_gal_, 8: F14A.Pylon8.Fuel_tank_300_gal_}.items():
         u.load_pylon(store, st)
     u.fuel = F14A.fuel_max
+    # the ferry crew aligned the INS during yesterday's engine runs and the jet hasn't moved: stored heading is valid
+    u.set_property("INSAlignmentStored", True)
+    u.set_property("TacanChannel", 74)                # HATCHET's one favour in the cockpit: Mother's TACAN, 74X
+    u.set_property("TacanBand", 0)
     u.gun, u.chaff, u.flare = 100, 60, 30
     g.set_frequency(251.0)
     g.add_waypoint(fp.point_from_heading(270, 8000), 1500 * FT, 450 * KTS, name="RUN WEST")
