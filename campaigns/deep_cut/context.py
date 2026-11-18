@@ -96,5 +96,5 @@ def escape(miz, work):
     code = re.search(r'CODE = "([^"]+)"', c).group(1)
     return dict(miz=Path(miz).name, code=code, id_nm=f"{cfg_num(c, 'ID_R') / NM:.0f}", clear_nm=f"{cfg_num(c, 'KEEP_CLEAR') / NM:.0f}",
                 start=hm(start), start_z=hms(start - ZULU), discover=hms(start + disc),
-                discover_min=round(disc / 60), react=int(react), notice=int(cfg_num(c, "TAKEOFF_NOTICE")),
+                discover_min=round(disc / 60), react=int(react), react_min=round(react / 60), notice=int(cfg_num(c, "TAKEOFF_NOTICE")),
                 route=route(d, "Enfield"), load=loadout(d, "Enfield"))

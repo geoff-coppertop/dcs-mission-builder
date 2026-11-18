@@ -11,7 +11,7 @@ F-14A Tomcat · 1 player, or 2 with a RIO · Caucasus · escape and evasion in a
 | | | | |
 |---|---|---|---|
 | Start | **{{ start }} local**, cold on the ramp | Seen by | about **{{ discover }}**, or {{ notice }} s after you take off |
-| Jet | Red's F-14A, readied for a ferry flight: full fuel, two tanks, **gun only** | Chasing | Two MiG-29s off Kutaisi, {{ react }} s after you're seen |
+| Jet | Red's F-14A, readied for a ferry flight: full fuel, two tanks, **gun only** | Chasing | Two MiG-29s off Kutaisi, about {{ react_min }} min after you're seen |
 | Home | CVN-74 · 127.5 · TACAN 74X · ICLS 11 | Help | CHEVY CAP at the coast, ARCO, MAGIC |
 | Code word | **{{ code }}**: check in with MAGIC once airborne | ID zone | {{ id_nm }} nm from Mother: unknown jets get intercepted |
 
@@ -26,7 +26,7 @@ F-14A Tomcat · 1 player, or 2 with a RIO · Caucasus · escape and evasion in a
 
 "Their crew aligned it during engine runs yesterday and nobody's moved it since, so use the stored heading. A full alignment and you'll still be sitting here when the guards come round. The start cart's still hooked up for them. Good thing: no APU on these.
 
-"Guards are doubled after what you lot did to the gorge. Someone checks this end at about **{{ discover }}**, so be rolling well before that. The moment you take off they'll know, and the guns on this field will open up: ZU-23s, a Shilka, an SA-13. Kutaisi has its alert at readiness. Figure two MiG-29s about a minute behind you.
+"Guards are doubled after what you lot did to the gorge. Someone checks this end at about **{{ discover }}**, so be rolling well before that. The moment you take off they'll know, and the guns on this field will open up: ZU-23s, a Shilka, an SA-13. Kutaisi's alert crews are sitting in their jets since yesterday, but the word still has to get from here to the sector and back down to them. Figure two MiG-29s off the ground five or six minutes after you're seen. Use the head start.
 
 "Go west, low and fast, to the coast. The Navy knows someone's coming out in a Red Tomcat. It doesn't know when, or which blip is you. Once you're airborne, call MAGIC and give them **{{ code }}**. If you don't, the CAP will come and look at you before anyone lets you near the boat. Mother's TACAN is 74X. Their radios are set up for their flight, not yours.
 
@@ -41,7 +41,7 @@ Start the Tomcat, get airborne and get home to Mother.
 ## How the game plays it
 
 - **Get moving.** The stored-heading alignment takes about 3 minutes and runs while the engines spin up; a full alignment (about 8) won't finish before the guards arrive. The jet is noticed {{ notice }} seconds after you take off, when the guards arrive, or at once if you fire the gun on the field.
-- **The chase.** {{ react }} seconds after you're seen, two MiG-29s launch from Kutaisi, about 25 nm east. MAGIC commits CHEVY, two Hornets on CAP off the coast, onto them.
+- **The chase.** {{ react_min }} minutes after you're seen (relaying the report, then a scramble from cockpit readiness), two MiG-29s launch from Kutaisi, about 25 nm east. Get feet wet before they're up and they have to chase you into CHEVY, two Hornets on CAP off the coast, which MAGIC commits onto them. Slow on the ramp, or a long time over land, and they catch you.
 - **Identification.** Once you're airborne, F10 > Escape > Check in with MAGIC declares you friendly. If you cross into the ID zone ({{ id_nm }} nm from Mother) without checking in, CHEVY intercepts and has to get close enough to see you. Mother won't clear an unidentified jet inside {{ clear_nm }} nm.
 
 ## What happens next

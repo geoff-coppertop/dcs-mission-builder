@@ -22,7 +22,9 @@ from missionbuilder.red_arms import arm
 START = datetime.datetime(2027, 1, 15, 8, 50, 0)     # the next morning, just after sunrise
 DISCOVER = 9 * 60                                    # guards reach the jet this long after start (base on alert):
                                                      # a stored-heading start (~3 min align) plus taxi, with some margin
-ALERT_REACT = 60                                     # Kutaisi's alert is quick this morning
+ALERT_REACT = 6 * 60                                 # Kutaisi's alert after the jet is seen: 1-2 min to relay the
+                                                     # report to the sector and on to Kutaisi, then a cockpit-
+                                                     # readiness scramble (takeoff within 5 min)
 COAST = (42.200, 41.640)                             # feet wet, south of the Enguri mouth
 
 
