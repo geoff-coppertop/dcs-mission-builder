@@ -1,0 +1,55 @@
+# Operation Deep Cut
+
+A standalone low-level strike on the Caucasus map for up to six players: two pairs of F/A-18C strike Hornets and a
+pair of F-14B escorts, all cold on the deck of the John C. Stennis. One Hornet can fly it alone.
+
+Red has dug a hardened missile store into the wall of the upper Enguri gorge near Khaishi. The only way in is the
+tunnel portal on the gorge floor. The strike coasts in at the Enguri mouth, follows the river to Jvari and flies up
+the gorge under a radar floor. The first laser-guided bomb has to bring down the portal's blast door, and a second
+has to go through it before Red closes the inner door. Then everyone has to get out past SAMs that wake up
+behind them and fighters heading for the gorge mouth.
+
+## Missions
+
+| File | What it is |
+|---|---|
+| `Operation_Deep_Cut.miz` | Standard: 500 ft floor with a warning, ±45 s window, 90 s to make the kill, SA-6 and SA-8 at the climb-out, MiG-29s and MiG-21s |
+| `Operation_Deep_Cut_Hard.miz` | Hard: 300 ft floor, no warning, ±30 s window, 60 s for the kill, SA-11 and SA-15/SA-8, a ZSU-23-4 in the gorge, MiG-29s and Su-27s, Kutaisi back up sooner |
+
+## What drives it
+
+- **Radar floor.** From the gorge mouth to 3.8 nm from the portal, any player jet more than the floor height above
+  the ground for a few seconds is seen: the climb-out SAMs come up, the northern alert launches, and before HAMMER the
+  Kutaisi alert does too. Escorts count, so they hold west of the gorge until the first bomb.
+- **Timing.** HAMMER, a scripted TLAM strike, cuts the Kutaisi runway three minutes before TOT and keeps its alert on
+  the ground for a fixed time. Bombs before HAMMER launch it at once; a late breach finds the SAMs already up.
+- **Breach, then kill.** The first bomb within 15 m (12 m hard) of the blast door breaches it. A different bomb within
+  the same distance inside the kill window destroys the store. One bomb can't do both.
+- **Survival is scored.** The summary scores 100 points: 40 target, 20 timing (on time, unseen), 40 shared across every
+  player jet that launches and lands (aboard or a divert). The store must be destroyed for SUCCESS or TEXTBOOK.
+- **AI escort backfill.** If no human Tomcat is airborne 15 minutes before TOT, FORD (two AI F-14Bs) takes the escort station.
+
+Flags at the end: 90 = 1 textbook, 2 success, 3 partial, 4 failure; 92 = the score.
+
+## Placement on DCS terrain
+
+pydcs has no terrain elevation, and the gorge above the Enguri dam is only known here to a kilometre or two. So the
+target and all Red ground sites are not in the `.miz`: the mission script spawns them at start, using DCS's own
+`land.getHeight` to find the gorge floor nearest each planned point (guns, MANPADS, the portal) or the highest ground
+(the climb-out SAMs), and avoids water. It marks the floor it found on the F10 map from Jvari to the portal and
+sends the portal's exact coordinates, because the TGT waypoint is only the planned point. The radar floor is measured
+above the real terrain under each jet.
+
+Jvari and the dam use published coordinates. Everything above the dam is estimated, so check it in the Mission
+Editor or on the F10 map before you rely on the waypoints.
+
+## Building
+
+From the repository root: `python build.py deep_cut`. See the [main README](../../README.md).
+
+| Source | What it builds |
+|---|---|
+| `build_deep_cut.py`, `lua/deep_cut.lua` | Both variants (uses the shared `lua/common.lua`) |
+| `briefings/deep_cut.md`, `context.py` | Briefings |
+| `maps_deep_cut.py` | Theater and gorge maps |
+| `tests/test_deep_cut.py` | Scenario tests against the built `.miz`, including placement on a synthetic gorge |

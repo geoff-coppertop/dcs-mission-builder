@@ -97,7 +97,8 @@ def parse_miz(path):
                         units.append(d)
                     pts = g.route.points
                     route = [{"name": pts[i].name or "", "type": pts[i].type, "ll": xz_to_ll(pts[i].x, pts[i].y),
-                              "alt": pts[i].alt, "speed": pts[i].speed} for i in range(1, len(pts) + 1)]
+                              "alt": pts[i].alt, "alt_type": pts[i].alt_type or "BARO", "speed": pts[i].speed}
+                             for i in range(1, len(pts) + 1)]
                     out["groups"][g.name] = {"side": side, "cat": cat, "units": units, "route": route,
                                              "late": bool(g.lateActivation)}
     # the mission script is the DO SCRIPT that carries the "T.cfg = {" block

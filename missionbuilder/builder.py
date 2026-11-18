@@ -138,6 +138,45 @@ class Builder:
         self.enfield_g = g
         return g
 
+    def flight(self, name, ptype, loadouts, route, callsign, skills, freq=251.0, maintask=task.GroundAttack,
+               land=True, eta=None):
+        """A player flight off the carrier, cold start. loadouts: one {station: store} per jet; skills: one
+        Skill per jet (Player / Client). route: [(name, point, alt_ft, kts) ...] or (..., "RADIO") for an AGL
+        waypoint. eta: {waypoint name: seconds after mission start} to lock. MOTHER landing appended if land."""
+        g = self.m.flight_group_from_unit(self.usa, name, ptype, self.cvn, maintask=maintask,
+                                          start_type=dcs.mission.StartType.Cold, group_size=len(skills))
+        for i, u in enumerate(g.units, start=1):
+            u.skill = skills[i - 1]
+            u.name = f"{name} 1-{i}"
+            u.callsign_dict = {1: callsign, 2: 1, 3: i, "name": f"{name}1{i}"}
+            u.pylons.clear()
+            for st, store in loadouts[i - 1].items():
+                u.load_pylon(store, st)
+            u.fuel = ptype.fuel_max
+            u.gun = 100
+            u.chaff = 60
+            u.flare = 30
+        g.set_frequency(freq)
+        wps = {}
+        for leg in route:
+            wname, pt, alt_ft, kts = leg[:4]
+            w = g.add_waypoint(pt, alt_ft * FT, kts * KTS, name=wname)
+            if len(leg) > 4 and leg[4] == "RADIO":
+                w.alt_type = "RADIO"
+            if eta and wname in eta:
+                w.ETA, w.ETA_locked = eta[wname], True
+            wps[wname] = w
+        if land:
+            lp = MovingPoint(self.cvn_recovery)
+            lp.type, lp.action = "Land", PointAction.Landing
+            lp.helipad_id = lp.link_unit = self.cvn.units[0].id
+            lp.alt = lp.speed = 0
+            lp.ETA_locked = False
+            lp.name = "MOTHER"
+            lp.properties = PointProperties()
+            g.add_point(lp)
+        return g, wps
+
     # ------------------------------------------------------------ support
     def tanker(self, anchor, heading=230):
         a = self.m.refuel_flight(self.usa, "Arco", S_3B_Tanker, None, anchor, race_distance=30_000, heading=heading,

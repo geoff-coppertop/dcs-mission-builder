@@ -1,0 +1,204 @@
+"""Build Operation_Deep_Cut.miz and Operation_Deep_Cut_Hard.miz (Caucasus; F/A-18C strike, F-14B escort; 1-6 players).
+
+python3 build_deep_cut.py            -> both variants
+python3 build_deep_cut.py hard       -> one
+
+A low-level strike up the Enguri gorge on a tunnel portal near Khaishi. The target and every Red ground site are
+spawned by the mission script at start, placed on the real gorge floor (or high ground for the SAMs) with DCS's
+own terrain, starting from the planned points below. The planned points follow the river from published
+coordinates for Jvari and the Enguri dam; points above the dam are estimates and may be a kilometre or two off.
+"""
+import datetime
+import sys
+
+from dcs import task, mapping
+from dcs.planes import FA_18C_hornet as HN, F_14B, MiG_21Bis, MiG_29S, Su_27
+from dcs.unit import Skill
+
+from missionbuilder.builder import Builder, W, FT, KTS
+from missionbuilder.paths import read_lua
+from missionbuilder.red_arms import arm
+
+START = datetime.datetime(2027, 1, 14, 10, 0, 0)     # winter, mid-morning (Caucasus local = Z+4)
+TOT_OFFSET = 40 * 60
+ESCORT_CHECK_BEFORE = 15 * 60                        # AI escort takes over if no human Tomcat is airborne by TOT-15
+
+VARIANTS = {
+    "standard": dict(file="Operation_Deep_Cut.miz", title="Operation Deep Cut", tag="",
+                     window=45, repair=600, sam_up=90, react=45, kill_window=90, floor_ft=500, grace=4, warn=True,
+                     hit_r=15, south=(MiG_29S, Skill.Average, "two MiG-29s"), north=(MiG_21Bis, Skill.Average, "two MiG-21s"),
+                     sam_w=[("Kub 1S91 str", 0, 0), ("Kub 2P25 ln", 140, 60), ("Kub 2P25 ln", -120, 90)],
+                     sam_w_label="SA-6", sam_e=[("Osa 9A33 ln", 0, 0)], sam_e_label="SA-8",
+                     gun2="ZU-23 Emplacement"),
+    "hard": dict(file="Operation_Deep_Cut_Hard.miz", title="Operation Deep Cut (Hard)", tag=" (HARD)",
+                 window=30, repair=420, sam_up=60, react=30, kill_window=60, floor_ft=300, grace=2, warn=False,
+                 hit_r=12, south=(MiG_29S, Skill.Good, "two MiG-29s"), north=(Su_27, Skill.Good, "two Su-27s"),
+                 sam_w=[("SA-11 Buk SR 9S18M1", 0, 0), ("SA-11 Buk CC 9S470M1", 90, -70),
+                        ("SA-11 Buk LN 9A310M1", 160, 60), ("SA-11 Buk LN 9A310M1", -140, 100)],
+                 sam_w_label="SA-11", sam_e=[("Tor 9A331", 0, 0), ("Osa 9A33 ln", 150, -80)], sam_e_label="SA-15 and SA-8",
+                 gun2="ZSU-23-4 Shilka"),
+}
+
+# planned geography (lat, lon)
+FEET_DRY = (42.391, 41.559)        # Enguri mouth
+RIVER = (42.560, 41.880)           # the lower Enguri, north-west of Zugdidi
+GATE = (42.7189, 42.0458)          # Jvari, where the river leaves the gorge (published)
+DAM = (42.7592, 42.0319)           # Enguri dam (published)
+RESERVOIR = (42.800, 42.052)       # estimates from here up
+NARROWS = (42.850, 42.090)
+BEND = (42.900, 42.140)
+TGT = (42.952, 42.195)             # planned portal, near Khaishi
+PUSH = (42.320, 41.250)            # over the sea, short of the coast
+COVER = (42.550, 41.720)           # escort station, west of the gate
+TANKER = (42.300, 40.950)
+NORTH_SPAWN = (43.150, 42.450)     # over the main range
+
+
+def lua_pt(p):
+    return f"x = {p.x:.1f}, z = {p.y:.1f}"
+
+
+def build(key):
+    v = VARIANTS[key]
+    b = Builder(v["title"], START, v["file"])
+    P = b.P
+    b.m.weather.season_temperature = -4
+    s0 = b.start_s
+    tot = s0 + TOT_OFFSET
+    hammer = tot - 180
+    pts = {k: P(*ll) for k, ll in dict(FEET_DRY=FEET_DRY, RIVER=RIVER, GATE=GATE, DAM=DAM, RESERVOIR=RESERVOIR,
+                                       NARROWS=NARROWS, BEND=BEND, TGT=TGT, PUSH=PUSH, COVER=COVER,
+                                       TANKER=TANKER).items()}
+    tgt = pts["TGT"]
+    det_r = round(tgt.distance_to_point(pts["GATE"]) + 2000, -2)
+    pop_r = 7000
+    assert tgt.distance_to_point(pts["COVER"]) > det_r + 10_000, "escort station must be outside the radar-floor zone"
+
+    b.carrier(recovery_min=65)
+    cvn = b.cvn_start
+
+    # ------------------------------------------------------------ Blue
+    strike = {1: W["9X_1"], 2: W["HARM_2"], 3: W["GBU12_3"], 4: W["LITENING"], 5: W["TANK_5"],
+              6: W["120_6"], 7: W["GBU12_7"], 8: W["HARM_8"], 9: W["9X_9"]}
+
+    def strike_route():
+        return [("DEPART", cvn.point_from_heading(45, 18_000), 5000, 350),
+                ("PUSH", pts["PUSH"], 3000, 420),
+                ("FEET DRY", pts["FEET_DRY"], 500, 480, "RADIO"),
+                ("RIVER", pts["RIVER"], 500, 480, "RADIO"),
+                ("GATE", pts["GATE"], 300, 480, "RADIO"),
+                ("DAM", pts["DAM"], 300, 450, "RADIO"),
+                ("RESERVOIR", pts["RESERVOIR"], 300, 450, "RADIO"),
+                ("NARROWS", pts["NARROWS"], 300, 450, "RADIO"),
+                ("BEND", pts["BEND"], 300, 450, "RADIO"),
+                ("TGT", tgt, 300, 480, "RADIO"),
+                ("GATE OUT", pts["GATE"], 500, 520, "RADIO"),
+                ("FEET WET", pts["FEET_DRY"], 1000, 480),
+                ("TANKER", pts["TANKER"], 15000, 300)]
+
+    b.flight("Enfield", HN, [strike, strike], strike_route(), 1, [Skill.Player, Skill.Client],
+             eta={"TGT": TOT_OFFSET})
+    b.flight("Springfield", HN, [strike, strike], strike_route(), 2, [Skill.Client, Skill.Client],
+             eta={"TGT": TOT_OFFSET + 30})
+    cat = {1: F_14B.Pylon1.LAU_138_AIM_9M, 2: F_14B.Pylon2.AIM_54C_Mk60_, 3: F_14B.Pylon3.Fuel_tank_300_gal_,
+           4: F_14B.Pylon4.AIM_7M_, 6: F_14B.Pylon6.AIM_7M_, 8: F_14B.Pylon8.Fuel_tank_300_gal_,
+           9: F_14B.Pylon9.AIM_54C_Mk60__, 10: F_14B.Pylon10.LAU_138_AIM_9M}
+    b.flight("Dodge", F_14B, [cat, cat],
+             [("DEPART", cvn.point_from_heading(45, 18_000), 8000, 350),
+              ("COVER", pts["COVER"], 22000, 420),
+              ("SWEEP", pts["RIVER"], 22000, 450),
+              ("FEET WET", pts["FEET_DRY"], 20000, 420),
+              ("TANKER", pts["TANKER"], 15000, 300)],
+             5, [Skill.Client, Skill.Client], maintask=task.CAP)
+    b.tanker(pts["TANKER"])
+    b.awacs()
+
+    # FORD: AI Tomcats, activated by the script only if no human Tomcat is airborne by the check time
+    ford = b.m.flight_group_inflight(b.usa, "Ford", F_14B, pts["COVER"].point_from_heading(250, 15_000),
+                                     altitude=22000 * FT, speed=420 * KTS, maintask=task.CAP, group_size=2)
+    ford.late_activation = True
+    ford.points[0].tasks = [t for t in ford.points[0].tasks if not isinstance(t, task.CAPTaskAction)]
+    for i, u in enumerate(ford.units, start=1):
+        u.name, u.skill = f"Ford 1-{i}", Skill.Good
+        u.callsign_dict = {1: 6, 2: 1, 3: i, "name": f"Ford1{i}"}
+        u.pylons.clear()
+        for st, store in cat.items():
+            u.load_pylon(store, st)
+    cw = ford.add_waypoint(pts["COVER"], 22000 * FT, 420 * KTS, name="COVER")
+    cw.tasks.append(task.EngageTargetsInZone(position=mapping.Vector2(pts["COVER"].x, pts["COVER"].y), radius=70_000,
+                                             targets=[task.Targets.All.Air]))
+    cw.tasks.append(task.OrbitAction(altitude=22000 * FT, speed=420 * KTS, pattern=task.OrbitAction.OrbitPattern.Circle))
+
+    # ------------------------------------------------------------ Red fighters (late-activated; the script launches them)
+    def fighters(name, kind, at, alt_m, goal, radius):
+        ptype, skill, _ = kind
+        g = b.m.flight_group_inflight(b.rus, name, ptype, at, altitude=alt_m, speed=850, maintask=task.CAP, group_size=2)
+        g.late_activation = True
+        arm(g)
+        g.points[0].tasks = [t for t in g.points[0].tasks if not isinstance(t, task.CAPTaskAction)]
+        for i, u in enumerate(g.units, start=1):
+            u.name, u.skill = f"{name} {i}", skill
+        w = g.add_waypoint(goal, 5000, 900, name="Gorge mouth")
+        w.tasks.append(task.EngageTargetsInZone(position=mapping.Vector2(goal.x, goal.y), radius=radius,
+                                                targets=[task.Targets.All.Air]))
+        w.tasks.append(task.OrbitAction(altitude=5000, speed=800, pattern=task.OrbitAction.OrbitPattern.Circle))
+        return g
+
+    kutaisi = b.terrain.airports["Kutaisi"].position
+    fighters("Red South", v["south"], kutaisi.point_from_heading(300, 6000), 1500, pts["RIVER"], 60_000)
+    fighters("Red North", v["north"], P(*NORTH_SPAWN), 5000, pts["GATE"], 50_000)
+
+    # ------------------------------------------------------------ Red ground (spawned by the script)
+    def site(name, kind, ll_or_off, r, units, heading=0):
+        if kind == "guard":
+            x, z = ll_or_off
+        else:
+            p = P(*ll_or_off)
+            x, z = p.x, p.y
+        us = ", ".join(f'{{ "{t}", {dx}, {dz} }}' for t, dx, dz in units)
+        return f'    {{ name = "{name}", kind = "{kind}", x = {x:.1f}, z = {z:.1f}, r = {r}, heading = {heading}, units = {{ {us} }} }},'
+
+    sites = [
+        site("Gorge Guns 1", "valley", (42.870, 42.112), 1500,
+             [("ZU-23 Emplacement", 0, 0), ("SA-18 Igla manpad", 35, 25), ("SA-18 Igla comm", 40, 30)], 200),
+        site("Gorge Guns 2", "valley", (42.915, 42.155), 1500,
+             [(v["gun2"], 0, 0), ("SA-18 Igla manpad", -30, 30), ("SA-18 Igla comm", -35, 35)], 200),
+        site("Gorge MANPADS", "valley", (42.937, 42.177), 1200,
+             [("SA-18 Igla manpad", 0, 0), ("SA-18 Igla manpad", 60, -40), ("SA-18 Igla comm", 30, -20)], 220),
+        site("Portal Guard", "guard", (150, -120), 0,
+             [("ZU-23 Emplacement Closed", 0, 0), ("SA-18 Igla manpad", 40, 30), ("SA-18 Igla comm", 45, 35)], 200),
+        site(f"Climb-out {v['sam_w_label']}", "sam", (42.965, 42.150), 1200, v["sam_w"], 160),
+        site(f"Climb-out {v['sam_e_label']}", "sam", (42.935, 42.240), 1200, v["sam_e"], 250),
+    ]
+    canyon = [("GATE", "GATE"), ("DAM", "DAM"), ("RESERVOIR", "RESERVOIR"), ("NARROWS", "NARROWS"),
+              ("BEND", "BEND"), ("PORTAL", "TGT")]
+    canyon_lua = ", ".join(f'{{ name = "{n}", {lua_pt(pts[k])}, r = 1500 }}' for n, k in canyon)
+
+    cfg = f"""T.cfg = {{
+  NAME = "OPERATION DEEP CUT{v['tag']}", START = {s0}, TOT = {tot}, WINDOW = {v['window']},
+  HAMMER = {hammer}, REPAIR = {v['repair']}, SAM_UP = {v['sam_up']}, REACT = {v['react']}, KILL_WINDOW = {v['kill_window']},
+  FLOOR_FT = {v['floor_ft']}, GRACE = {v['grace']}, WARN = {'true' if v['warn'] else 'false'},
+  BREACH_R = {v['hit_r']}, KILL_R = {v['hit_r']}, AT_TARGET_R = 400,
+  TGT = {{ {lua_pt(tgt)} }}, TGT_R = 2500, DET_R = {det_r:.0f}, POP_R = {pop_r},
+  SITES = {{
+{chr(10).join(sites)}
+  }},
+  CANYON = {{ {canyon_lua} }},
+  SOUTH_GROUP = "Red South", NORTH_GROUP = "Red North", SOUTH_KIND = "{v['south'][2]}", NORTH_KIND = "{v['north'][2]}",
+  SOUTH_BASE = "Kutaisi", ALERT_REACT = 90,
+  ESCORT_PREFIX = "Dodge", ESCORT_AI = "Ford", ESCORT_CHECK = {tot - ESCORT_CHECK_BEFORE},
+  JETS = {{ "Enfield 1-1", "Enfield 1-2", "Springfield 1-1", "Springfield 1-2", "Dodge 1-1", "Dodge 1-2" }},
+  PTS_BREACH = 15, PTS_KILL = 25, PTS_ONTIME = 12, PTS_UNSEEN = 8, PTS_SURVIVAL = 40,
+  OUTCOME_FLAG = "90", SCORE_FLAG = "92",
+}}
+"""
+    b.add_script(read_lua("common.lua"))
+    b.add_script(read_lua("deep_cut.lua"), cfg, keep_copy=f"deep_cut_{key}_built.lua")
+    # Briefing text comes from briefings/deep_cut.md: build.py renders it and writes it into the .miz.
+    b.save(v["title"], "See the mission briefing.", "See the mission briefing.")
+    return b
+
+
+if __name__ == "__main__":
+    for k in (sys.argv[1:] or ["standard", "hard"]):
+        build(k)

@@ -19,13 +19,18 @@ timer = {
   scheduleFunction = function(fn, arg, t) M.sched[#M.sched+1] = {fn=fn, arg=arg, t=t} end,
 }
 coalition = { side = { RED = 1, BLUE = 2 } }
+M.marks, M.explosions, M.statics = {}, {}, {}
 trigger = { action = {
     outTextForCoalition = function(side, text) log(text) end,
     smoke = function() M.smoke = M.smoke + 1 end,
     activateGroup = function(g) M.activated[g.name] = true end,
-    setUserFlag = function(f, v) M.flags[f] = v end },
+    setUserFlag = function(f, v) M.flags[f] = v end,
+    explosion = function(p, power) M.explosions[#M.explosions+1] = { p = p, power = power } end,
+    markToAll = function(id, text, p) M.marks[#M.marks+1] = { id = id, text = text, p = p } end,
+    lineToAll = function() end, circleToAll = function() end, removeMark = function() end },
   smokeColor = { Green = 0, Red = 1, White = 2, Orange = 3, Blue = 4 },
-  misc = { getZone = function(n) return M.zones and M.zones[n] end } }
+  misc = { getZone = function(n) return M.zones and M.zones[n] end,
+           getUserFlag = function(f) local v = M.flags[tostring(f)] return (v and v ~= 0) and 1 or 0 end } }
 AI = { Option = {
   Ground = { id = { ALARM_STATE = 9, ROE = 0 },
              val = { ALARM_STATE = { AUTO = 0, GREEN = 1, RED = 2 }, ROE = { OPEN_FIRE = 2, RETURN_FIRE = 3, WEAPON_HOLD = 4 } } },
@@ -35,7 +40,11 @@ Weapon = { Category = { SHELL = 0, MISSILE = 1, ROCKET = 2, BOMB = 3 },
 world = { event = { S_EVENT_SHOT = 1, S_EVENT_HIT = 2, S_EVENT_TAKEOFF = 3, S_EVENT_LAND = 4, S_EVENT_CRASH = 5,
                     S_EVENT_EJECTION = 6, S_EVENT_DEAD = 8, S_EVENT_PILOT_DEAD = 9, S_EVENT_UNIT_LOST = 30 },
           addEventHandler = function(h) M.handlers[#M.handlers+1] = h end }
-land = { isVisible = function() return true end, getHeight = function() return 12 end }
+-- terrain: flat at 12 m unless a test sets M.heightFn(x, z) / M.waterFn(x, z)
+land = { isVisible = function() return true end,
+         getHeight = function(p) if M.heightFn then return M.heightFn(p.x, p.y) end return 12 end,
+         SurfaceType = { LAND = 1, SHALLOW_WATER = 2, WATER = 3, ROAD = 4, RUNWAY = 5 },
+         getSurfaceType = function(p) if M.waterFn and M.waterFn(p.x, p.y) then return 3 end return 1 end }
 coord = { LOtoLL = function(p) return 42.74, 41.505, 0 end,
           LLtoMGRS = function() return { UTMZone = "37T", MGRSDigraph = "GH", Easting = 123, Northing = 45678 } end }
 missionCommands = {
@@ -84,7 +93,11 @@ function M.mkGroup(name, units)
   return g
 end
 Group = { getByName = function(n) return M.groups[n] end, Category = { AIRPLANE = 0, HELICOPTER = 1, GROUND = 2 } }
-country = { id = { USA = 2 } }
+country = { id = { USA = 2, RUSSIA = 0 } }
+coalition.addStaticObject = function(c, data)
+  M.statics[data.name] = data
+  return data
+end
 M.redAir = {}      -- names of Red air groups, for coalition.getGroups
 coalition.getGroups = function(side, cat)
   local out = {}

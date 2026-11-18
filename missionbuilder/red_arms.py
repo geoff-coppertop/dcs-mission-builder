@@ -3,7 +3,7 @@
 pydcs can only load DCS's default payloads from a local DCS install, so without one every AI fighter
 is saved with empty pylons. These are typical period fits, set pylon by pylon.
 """
-from dcs.planes import MiG_21Bis, MiG_29A, MiG_29S
+from dcs.planes import MiG_21Bis, MiG_29A, MiG_29S, Su_27
 
 LOADOUTS = {
     MiG_21Bis.id: {1: MiG_21Bis.Pylon1.APU_60_2M_with_2_x_R_60M__AA_8_Aphid_B____IR_AAM,
@@ -20,6 +20,15 @@ LOADOUTS = {
                  5: MiG_29S.Pylon5.R_27ER__AA_10_Alamo_C____Semi_Act_Extended_Range,
                  6: MiG_29S.Pylon6.R_73__AA_11_Archer____Infra_Red, 7: MiG_29S.Pylon7.R_73__AA_11_Archer____Infra_Red},
 }
+
+
+LOADOUTS[Su_27.id] = {   # 4x R-73, 2x R-27ET (IR, outer wing), 2x R-27ER (inner wing)
+    1: Su_27.Pylon1.R_73__AA_11_Archer____Infra_Red, 2: Su_27.Pylon2.R_73__AA_11_Archer____Infra_Red,
+    3: Su_27.Pylon3.R_27ET__AA_10_Alamo_D____IR_Extended_Range,
+    4: Su_27.Pylon4.R_27ER__AA_10_Alamo_C____Semi_Act_Extended_Range,
+    7: Su_27.Pylon7.R_27ER__AA_10_Alamo_C____Semi_Act_Extended_Range,
+    8: Su_27.Pylon8.R_27ET__AA_10_Alamo_D____IR_Extended_Range,
+    9: Su_27.Pylon9.R_73__AA_11_Archer____Infra_Red, 10: Su_27.Pylon10.R_73__AA_11_Archer____Infra_Red}
 
 
 def arm(group):
