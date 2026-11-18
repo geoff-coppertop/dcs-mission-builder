@@ -1,0 +1,97 @@
+"""Build Operation_Deep_Cut_Escape.miz: the follow-up flown when a Deep Cut pilot ejects over land.
+
+A captured F-14B, cold on the ramp at Senaki-Kolkhi (neutral field, Red guards around it). Get airborne before
+you are seen, outrun the Kutaisi alert to the coast where CHEVY holds CAP, and land aboard CVN-74.
+One jet, 1 player; in multiplayer a second player can take the RIO seat.
+"""
+import datetime
+
+import dcs
+from dcs import task, mapping
+from dcs.planes import F_14B, MiG_29S
+from dcs.point import MovingPoint, PointAction, PointProperties
+from dcs.unit import Skill
+from dcs.vehicles import AirDefence
+
+from missionbuilder.builder import Builder, FT, KTS
+from missionbuilder.paths import read_lua
+from missionbuilder.red_arms import arm
+
+START = datetime.datetime(2027, 1, 15, 8, 50, 0)     # the next morning, just after sunrise
+DISCOVER = 8 * 60                                    # guards reach the jet this long after start
+COAST = (42.200, 41.640)                             # feet wet, south of the Enguri mouth
+
+
+def build():
+    b = Builder("Operation Deep Cut: Escape", START, "Operation_Deep_Cut_Escape.miz")
+    b.m.weather.season_temperature = -6
+    P = b.P
+    field = b.terrain.airports["Senaki-Kolkhi"]
+    fp = field.position
+    coast = P(*COAST)
+
+    b.carrier(recovery_min=40)
+    b.tanker(P(42.30, 40.95))
+    b.awacs()
+    b.cap(P(42.25, 41.25), commit_point=coast)
+
+    # the captured Tomcat: two AIM-9M and the gun, under half fuel
+    g = b.m.flight_group_from_airport(b.usa, "Enfield", F_14B, field, maintask=task.CAP,
+                                      start_type=dcs.mission.StartType.Cold, group_size=1)
+    u = g.units[0]
+    u.name, u.skill = "Enfield 1-1", Skill.Player
+    u.callsign_dict = {1: 1, 2: 1, 3: 1, "name": "Enfield11"}
+    u.pylons.clear()
+    u.load_pylon(F_14B.Pylon1.LAU_138_AIM_9M, 1)
+    u.load_pylon(F_14B.Pylon10.LAU_138_AIM_9M, 10)
+    u.fuel = round(F_14B.fuel_max * 0.45)
+    u.gun, u.chaff, u.flare = 100, 30, 15
+    g.set_frequency(251.0)
+    g.add_waypoint(fp.point_from_heading(270, 8000), 1500 * FT, 450 * KTS, name="RUN WEST")
+    g.add_waypoint(coast, 1500 * FT, 480 * KTS, name="FEET WET")
+    g.add_waypoint(P(42.25, 41.25), 10000 * FT, 400 * KTS, name="CHEVY")
+    land = MovingPoint(b.cvn_recovery)
+    land.type, land.action = "Land", PointAction.Landing
+    land.helipad_id = land.link_unit = b.cvn.units[0].id
+    land.alt = land.speed = 0
+    land.ETA_locked = False
+    land.name = "MOTHER"
+    land.properties = PointProperties()
+    g.add_point(land)
+
+    # Red guards on the field: quiet until the jet is seen
+    b.vgroup(b.rus, "Senaki Guns North", [("Senaki ZU-23 N1", AirDefence.ZU_23_Emplacement, fp.point_from_heading(0, 700)),
+                                          ("Senaki ZU-23 N2", AirDefence.ZU_23_Emplacement, fp.point_from_heading(20, 800))], 180)
+    b.vgroup(b.rus, "Senaki Guns South", [("Senaki ZU-23 S1", AirDefence.ZU_23_Emplacement, fp.point_from_heading(180, 700)),
+                                          ("Senaki ZSU-23-4", AirDefence.ZSU_23_4_Shilka, fp.point_from_heading(200, 900))], 0)
+    b.vgroup(b.rus, "Senaki SA-13", [("Senaki SA-13", AirDefence.Strela_10M3, fp.point_from_heading(90, 1500))], 270)
+
+    # the Kutaisi alert: launches after the jet is seen
+    kut = b.terrain.airports["Kutaisi"].position
+    r = b.m.flight_group_inflight(b.rus, "Red South", MiG_29S, kut.point_from_heading(300, 6000), altitude=1500,
+                                  speed=900, maintask=task.CAP, group_size=2)
+    r.late_activation = True
+    arm(r)
+    r.points[0].tasks = [t for t in r.points[0].tasks if not isinstance(t, task.CAPTaskAction)]
+    for i, ru in enumerate(r.units, start=1):
+        ru.name, ru.skill = f"Red South {i}", Skill.Good
+    w = r.add_waypoint(coast, 4000, 1000, name="Coast")
+    w.tasks.append(task.EngageTargetsInZone(position=mapping.Vector2(coast.x, coast.y), radius=70_000,
+                                            targets=[task.Targets.All.Air]))
+    w.tasks.append(task.OrbitAction(altitude=4000, speed=850, pattern=task.OrbitAction.OrbitPattern.Circle))
+
+    cfg = f"""T.cfg = {{
+  NAME = "OPERATION DEEP CUT: ESCAPE", START = {b.start_s}, DISCOVER = {DISCOVER}, TAKEOFF_NOTICE = 20, ALERT_REACT = 90,
+  FIELD = "Senaki-Kolkhi", FIELD_AD = {{ "Senaki Guns North", "Senaki Guns South", "Senaki SA-13" }},
+  SOUTH_GROUP = "Red South", SOUTH_KIND = "two MiG-29s", SOUTH_BASE = "Kutaisi",
+  JET = "Enfield 1-1", OUTCOME_FLAG = "90",
+}}
+"""
+    b.add_cap_scripts("the coast")
+    b.add_script(read_lua("common.lua"))
+    b.add_script(read_lua("escape.lua"), cfg, keep_copy="escape_built.lua")
+    b.save("Operation Deep Cut: Escape", "See the mission briefing.", "See the mission briefing.")
+
+
+if __name__ == "__main__":
+    build()

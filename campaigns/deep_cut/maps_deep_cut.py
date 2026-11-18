@@ -26,7 +26,53 @@ def rng(t):
     return getattr(c, "threat_range", 0) or 0
 
 
+def draw_escape(miz):
+    d = parse_miz(miz)
+    g = d["groups"]
+    stem = Path(miz).stem
+    en = g["Enfield"]["route"]
+    pts = [p["ll"] for p in en] + [g["Red South"]["route"][0]["ll"]]
+    ext = ext_fit(pts, pad=0.08, min_span=1.0)
+    fig, ax = plt.subplots(figsize=(7.4, 5.6), dpi=220)
+    base_map(ax, ext, 0.25)
+    for n_, (la, lo) in PLACES.items():
+        if in_ext(ext, (la, lo), 0.02) and n_ not in ("Senaki", "Kutaisi"):
+            ax.plot(lo, la, "s", ms=2.6, color=INK2, zorder=6)
+            label(ax, lo, la, n_, INK2, dx=4, dy=-1, size=6.4)
+    s0 = en[0]["ll"]
+    ax.plot(s0[1], s0[0], "*", ms=12, color=BLUE, mec="white", mew=0.7, zorder=11)
+    label(ax, s0[1], s0[0], "Senaki-Kolkhi: the Tomcat", BLUE, dx=8, dy=8, size=7, weight="bold")
+    for gn in ("Senaki Guns North", "Senaki Guns South", "Senaki SA-13"):
+        for u in g[gn]["units"]:
+            ax.plot(u["ll"][1], u["ll"][0], "D", ms=3.5, color=ORANGE, zorder=9)
+    r = g["Red South"]["route"]
+    ax.plot(r[0]["ll"][1], r[0]["ll"][0], "^", ms=6, color=RED, zorder=8)
+    arrow(ax, r[0]["ll"], r[1]["ll"], RED, lw=0.9, ls=(0, (3, 2)))
+    label(ax, r[0]["ll"][1], r[0]["ll"][0], "Kutaisi alert: MiG-29S ×2\n(launches once you're seen)", RED, dx=-6, dy=-16, ha="right", size=6.4)
+    st = [p for p in g["Chevy"]["route"] if p["name"] == "CAP STATION"][0]["ll"]
+    ring(ax, st, 5000, color=VIOLET, lw=1.4, zorder=6)
+    label(ax, *dest(st, 270, 5200)[::-1], "CHEVY CAP", VIOLET, dx=-4, ha="right", size=6.4)
+    xs, ys = [p["ll"][1] for p in en], [p["ll"][0] for p in en]
+    ax.plot(xs, ys, color=BLUE, lw=1.8, zorder=7)
+    for i, p in enumerate(en[1:-1], start=1):
+        ax.plot(p["ll"][1], p["ll"][0], "o", ms=8, color="white", mec=BLUE, mew=1.5, zorder=10)
+        ax.text(p["ll"][1], p["ll"][0], str(i), ha="center", va="center", fontsize=5.6, color=BLUE, fontweight="bold", zorder=11)
+        label(ax, p["ll"][1], p["ll"][0], p["name"], BLUE, dx=7, dy=-7, size=6.6)
+    m_ = en[-1]["ll"]
+    ax.plot(m_[1], m_[0], "D", ms=5.5, color=INK, zorder=9)
+    label(ax, m_[1], m_[0], "MOTHER (est.)", INK, dy=-10, ha="center", va="top", size=6.4)
+    scale_bar(ax, ext, 10)
+    north_arrow(ax, ext)
+    ax.set_title("THE WAY HOME", loc="left", fontsize=9.5, color=INK, fontweight="bold", pad=6)
+    fig.tight_layout()
+    fig.savefig(f"{stem}_theater.png", bbox_inches="tight", pad_inches=0.08)
+    plt.close(fig)
+    print("maps", stem)
+
+
 def draw(miz):
+    if "Escape" in Path(miz).stem:
+        return draw_escape(miz)
     d = parse_miz(miz)
     c = d["cfg"]
     g = d["groups"]
@@ -65,10 +111,6 @@ def draw(miz):
         ax.plot(a[1], a[0], "^", ms=6, color=col, zorder=8)
         arrow(ax, a, b2, col, lw=0.9, ls=(0, (3, 2)))
         label(ax, a[1], a[0], f"{lab}: {g[gn]['units'][0]['type']} ×{len(g[gn]['units'])}", col, dx=-6, dy=5, ha="right", size=6.4)
-    cv = g["Dodge"]["route"]
-    cov = [p for p in cv if p["name"] == "COVER"][0]["ll"]
-    ring(ax, cov, 6000, color=VIOLET, lw=1.4, zorder=6)
-    label(ax, *dest(cov, 270, 6200)[::-1], "DODGE escort\nstation", VIOLET, dx=-4, ha="right", size=6.4)
     if "Arco" in g:
         r = g["Arco"]["route"]
         a, b2 = r[1]["ll"], dest(r[1]["ll"], 230, 30000)
@@ -93,10 +135,9 @@ def draw(miz):
     ax.legend(handles=[Line2D([], [], color=BLUE, lw=2, label="Strike route (solid in, dashed out)"),
                        Line2D([], [], color=RED, lw=1, ls="--", label="Radar floor zone"),
                        Line2D([], [], color=ORANGE, lw=1, label="Climb-out SAM reach (planned)"),
-                       Line2D([], [], color=VIOLET, lw=1.5, label="Escort station"),
                        Line2D([], [], color=AQUA, lw=3, label="Tanker track")],
               loc="upper left", fontsize=6.2, framealpha=0.92, edgecolor=GRID)
-    ax.set_title("THEATER  ·  route, escort and threats", loc="left", fontsize=9.5, color=INK, fontweight="bold", pad=6)
+    ax.set_title("THEATER  ·  route and threats", loc="left", fontsize=9.5, color=INK, fontweight="bold", pad=6)
     fig.tight_layout()
     fig.savefig(f"{stem}_theater.png", bbox_inches="tight", pad_inches=0.08)
     plt.close(fig)
@@ -118,6 +159,8 @@ def draw(miz):
         if nm_ != "PORTAL":
             label(ax, p[1], p[0], nm_, BLUE, dx=-7, ha="right", size=6.8, weight="bold")
     ring(ax, tgt, cfg_num(c, "TGT_R"), color=INK2, lw=0.7, ls=(0, (1, 1.5)), zorder=5)
+    ring(ax, tgt, cfg_num(c, "TEAM_R_MAX"), color=GREEN, lw=0.8, ls=(0, (2, 2)), zorder=5)
+    label(ax, *dest(tgt, 330, cfg_num(c, "TEAM_R_MAX"))[::-1], "HATCHET: highest ground in this ring\nthat sees the door", GREEN, dx=-4, dy=6, ha="right", size=6.4)
     ax.plot(tgt[1], tgt[0], "*", ms=13, color=RED, mec="white", mew=0.8, zorder=11)
     label(ax, tgt[1], tgt[0], "PORTAL (planned)\nplaced on the floor within the dotted ring", RED, dx=9, dy=12, size=6.8, weight="bold")
     styles = {}

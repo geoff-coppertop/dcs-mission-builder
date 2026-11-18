@@ -1,6 +1,8 @@
 -- Operation Deep Cut
 -- Low-level gorge strike on a tunnel portal: radar floor, TOT window opened by a TLAM strike (HAMMER) on the
 -- Red fighter base, two-bomb breach-then-kill attack, SAMs at the climb-out, fighters on the egress, scored tiers.
+-- HATCHET, a special forces team on the ridge, lases the portal on call. A pilot who ejects over land is
+-- sent to the follow-up, Operation Deep Cut: Escape.
 -- Requires common.lua (NG). Pure DCS scripting engine, Lua 5.1 compatible.
 --
 -- The target and every Red ground site are spawned at mission start, placed with DCS's own terrain
@@ -21,8 +23,9 @@ T.cfg = T.cfg or {
   CANYON = {},                       -- planned canyon checkpoints, gate to target: { name, x, z }
   SOUTH_GROUP = "Red South", NORTH_GROUP = "Red North", SOUTH_KIND = "two MiG-29s", NORTH_KIND = "two MiG-21s",
   SOUTH_BASE = "Kutaisi", ALERT_REACT = 90,
-  ESCORT_PREFIX = "Dodge", ESCORT_AI = "Ford", ESCORT_CHECK = 37500,
-  JETS = { "Enfield 1-1", "Enfield 1-2", "Springfield 1-1", "Springfield 1-2", "Dodge 1-1", "Dodge 1-2" },
+  TEAM = "Hatchet", TEAM_R_MIN = 1200, TEAM_R_MAX = 3000, LASER_CODE = 1688,
+  JETS = { "Enfield 1-1", "Enfield 1-2", "Springfield 1-1", "Springfield 1-2" },
+  NEXT_ESCAPE = "Operation_Deep_Cut_Escape.miz", RESCUE_FLAG = "91",
   PTS_BREACH = 15, PTS_KILL = 25, PTS_ONTIME = 12, PTS_UNSEEN = 8, PTS_SURVIVAL = 40,
   OUTCOME_FLAG = "90", SCORE_FLAG = "92",
 }
@@ -31,7 +34,7 @@ local FT = 0.3048
 
 T.s = { samsLive = false, samWhy = nil, detected = nil, high = {}, warned = {}, hammer = false,
         south = nil, north = nil, firstImpact = nil, breach = nil, kill = nil, sealed = false,
-        escortAI = false, spawned = {}, tgt = nil, floor = {}, misses = {}, shots = 0, diverted = {}, over = false }
+        team = nil, spawned = {}, tgt = nil, floor = {}, misses = {}, shots = 0, diverted = {}, over = false }
 local S = T.s
 
 ------------------------------------------------------------------ terrain
@@ -144,6 +147,7 @@ function T.spawnAll()
   T.spawnStatic("Portal Shelter 1", "Shelter", "ukrytie", tg, 70, 60, 30)
   T.spawnStatic("Portal Shelter 2", "Shelter", "ukrytie", tg, -60, 80, 300)
   T.spawnStatic("Portal Command", ".Command Center", "ComCenter", tg, 120, -40, 0)
+  T.placeTeam()
   for _, st in ipairs(C.SITES) do
     local at
     if st.kind == "sam" then at = T.snapHigh(st, st.r)
@@ -168,6 +172,43 @@ function T.spawnAll()
   end
   pcall(trigger.action.circleToAll, coalition.side.BLUE, 7300, { x = tg.x, y = tg.y, z = tg.z }, C.POP_R,
         { 1, 0.5, 0, 0.9 }, { 1, 0.5, 0, 0.05 }, 3, true)
+end
+
+------------------------------------------------------------------ HATCHET: the lasing team on the ridge
+-- the highest ground 1.2-3 km from the portal that can see it; hidden and immortal, Blue, lases only on call
+function T.placeTeam()
+  local tg = S.tgt
+  local aim = { x = tg.x, y = tg.y + 3, z = tg.z }
+  local best
+  for r = C.TEAM_R_MIN, C.TEAM_R_MAX, 300 do
+    for a = 0, 340, 20 do
+      local x, z = tg.x + r * math.cos(math.rad(a)), tg.z + r * math.sin(math.rad(a))
+      local y = h(x, z)
+      if (not best or y > best.y) and not wet(x, z) and land.isVisible({ x = x, y = y + 2, z = z }, aim) then
+        best = { x = x, y = y, z = z }
+      end
+    end
+  end
+  best = best or T.snapHigh(tg, 1500)
+  local ok = pcall(coalition.addGroup, country.id.USA, Group.Category.GROUND, {
+    name = C.TEAM, task = "Ground Nothing", route = { points = {} },
+    units = { { name = C.TEAM, type = "Soldier M4", x = best.x, y = best.z, heading = 0, skill = "Excellent", playerCanDrive = false } } })
+  if ok then
+    N.quiet(C.TEAM)
+    S.team = best
+  end
+end
+
+function T.laserOn()
+  if not S.team or not N.liveUnit(C.TEAM) then N.msg("HATCHET: Unable, no team on the ridge.", 8) return end
+  if S.kill then N.msg("HATCHET: Target's gone. Nothing to lase.", 8) return end
+  N.laserStart(C.TEAM, function()
+    if S.kill then return nil end
+    return { x = S.tgt.x, y = S.tgt.y, z = S.tgt.z }
+  end, C.LASER_CODE, "HATCHET")
+  local d = N.dist(S.team, S.tgt)
+  N.msg(string.format("HATCHET: Laser on the blast door, code %d. We're %.1f km %s of it, up high. Call terminate when done.",
+        C.LASER_CODE, d / 1000, N.compass(N.bearing(S.tgt, S.team))), 12)
 end
 
 ------------------------------------------------------------------ air defence and fighters
@@ -306,6 +347,7 @@ function T.impact(p, t, shooter, id)
   if miss <= C.KILL_R and id ~= S.breach.id and t <= S.sealAt then
     S.kill = { t = t, who = shooter }
     pcall(trigger.action.explosion, { x = S.tgt.x, y = S.tgt.y + 2, z = S.tgt.z }, 3000)
+    if N.laser.on then N.laserStop(true) end
     N.msg(string.format("%s: Through the portal! Secondaries in the tunnel. TARGET DESTROYED, %d s after the breach.\n" ..
           "Get out of the gorge. Climb-out SAMs and fighters will be coming up.", shooter, math.floor(t - S.breach.t + 0.5)), 25)
   else
@@ -352,9 +394,10 @@ function T.summary()
   if S.samsLive then alerts[#alerts + 1] = "climb-out SAMs up: " .. S.samWhy end
   if S.south then alerts[#alerts + 1] = C.SOUTH_BASE .. " alert launched" end
   if S.north then alerts[#alerts + 1] = "northern alert launched" end
-  if S.escortAI then alerts[#alerts + 1] = "AI escort " .. C.ESCORT_AI .. " flew the cover" end
   trigger.action.setUserFlag(C.OUTCOME_FLAG, ({ TEXTBOOK = 1, SUCCESS = 2, PARTIAL = 3, FAILURE = 4 })[sc.grade])
   trigger.action.setUserFlag(C.SCORE_FLAG, sc.total)
+  local rescue, onLand = N.rescue(C.NEXT_ESCAPE)
+  trigger.action.setUserFlag(C.RESCUE_FLAG, onLand)
   N.msg(C.NAME .. " - MISSION SUMMARY\n" ..
     string.format("Target %d/%d: %s.\n", sc.target, C.PTS_BREACH + C.PTS_KILL, tgt) ..
     string.format("Timing %d/%d: breach %s, %s.\n", sc.timing, C.PTS_ONTIME + C.PTS_UNSEEN, tim,
@@ -362,7 +405,7 @@ function T.summary()
     string.format("Survival %d/%d: %d of %d jets home%s.\n", sc.survival, C.PTS_SURVIVAL, sc.home, sc.launched,
                   #sc.lost > 0 and (" (" .. table.concat(sc.lost, "; ") .. ")") or "") ..
     (#alerts > 0 and ("Red: " .. table.concat(alerts, "; ") .. ".\n") or "Red never reacted.\n") ..
-    string.format("\nSCORE %d/100: %s.", sc.total, sc.grade), 90)
+    string.format("\nSCORE %d/100: %s.", sc.total, sc.grade) .. rescue, 90)
 end
 
 ------------------------------------------------------------------ menus
@@ -428,26 +471,19 @@ function T.init()
   at(C.TOT + C.SAM_UP, function() T.samsLive("Red alerted by HAMMER") end)
   at(C.TOT - 600, function()
     N.msg("MAGIC: Package check, TOT " .. N.clock(C.TOT) .. " in 10 minutes. Floor is " .. C.FLOOR_FT ..
-          " ft AGL from the gate at Jvari. Escort stay west of the gate until the first bomb.", 15)
-  end)
-  at(C.ESCORT_CHECK, function()
-    for _, un in pairs(N.rec.airborne) do
-      if type(un) == "string" and un:sub(1, #C.ESCORT_PREFIX) == C.ESCORT_PREFIX then return end
-    end
-    S.escortAI = true
-    N.activate(C.ESCORT_AI)
-    N.msg("MAGIC: No " .. C.ESCORT_PREFIX .. " airborne. " .. C.ESCORT_AI ..
-          ", two AI Tomcats, is taking the escort station off the coast.", 15)
+          " ft AGL from the gate at Jvari. HATCHET lases on call: F10 > Deep Cut.", 15)
   end)
   timer.scheduleFunction(T.floorTick, nil, timer.getTime() + 1)
 
   local root = missionCommands.addSubMenuForCoalition(N.BLUE, "Deep Cut")
   missionCommands.addCommandForCoalition(N.BLUE, "Time check", root, T.timeCheck)
   missionCommands.addCommandForCoalition(N.BLUE, "Target coordinates", root, T.targetInfo)
+  missionCommands.addCommandForCoalition(N.BLUE, "Hatchet: laser on the door", root, T.laserOn)
+  missionCommands.addCommandForCoalition(N.BLUE, "Hatchet: terminate (laser off)", root, function() N.laserStop(false, "HATCHET") end)
   missionCommands.addCommandForCoalition(N.BLUE, "Mission summary now", root, function() N.rec.summaryDone = false; N.recCheck(true) end)
 
   N.msg(C.NAME .. ". TOT " .. N.clock(C.TOT) .. ", window +/-" .. C.WINDOW .. " s. Radar floor " .. C.FLOOR_FT ..
-        " ft AGL. F10 > Deep Cut for time checks and the target's exact coordinates.", 20)
+        " ft AGL. F10 > Deep Cut for time checks, the target's exact coordinates and HATCHET's laser.", 20)
   timer.scheduleFunction(function() T.targetInfo() return nil end, nil, timer.getTime() + 5)
 end
 

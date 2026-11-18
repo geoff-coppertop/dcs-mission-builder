@@ -1,8 +1,8 @@
-<div class="kicker">Mission briefing · Enfield, Springfield and Dodge · standalone mission{% if hard %}, hard{% endif %}</div>
+<div class="kicker">Mission briefing · Enfield and Springfield · Deep Cut, mission 1{% if hard %}, hard{% endif %}</div>
 
 # Operation Deep Cut{% if hard %} (hard){% endif %}
 
-F/A-18C strike and F-14B escort · 1–6 players · Caucasus · low-level gorge strike · cold start and recovery aboard CVN-74
+F/A-18C · 1–4 players · Caucasus · low-level gorge strike · cold start and recovery aboard CVN-74
 
 <div class="glance" markdown="1">
 
@@ -11,7 +11,7 @@ F/A-18C strike and F-14B escort · 1–6 players · Caucasus · low-level gorge 
 | TOT | **{{ tot }} local** / {{ tot_z }}Z | Target | Tunnel portal on the Enguri gorge floor, near Khaishi |
 | Window | {{ win_on }}–{{ win_off }} (±{{ window }} s) | Attack | Breach the blast door, then a second bomb through it within {{ kill_window }} s |
 | Radar floor | {{ floor_ft }} ft AGL from Jvari to {{ pop_nm }} nm out | Threats | Guns and MANPADS in the gorge; {{ sam_names | join(" and ") }} at the climb-out; fighters |
-| Mother | CVN-74 · 127.5 · TACAN 74X · ICLS 11 | Support | HAMMER (TLAMs), DODGE escort, ARCO, MAGIC |
+| Mother | CVN-74 · 127.5 · TACAN 74X · ICLS 11 | Support | HAMMER (TLAMs), HATCHET (laser), ARCO, MAGIC |
 
 </div>
 
@@ -32,7 +32,7 @@ Coast in at the Enguri mouth below {{ floor_ft }} ft, follow the river {{ coast_
 
 **The radar floor.** From the GATE until you are {{ pop_nm }} nm from the portal, any jet more than **{{ floor_ft }} ft above the ground** for {{ grace }} second{{ "s" if grace > 1 }} is seen. {% if warn %}MAGIC warns you the first time you go above it. {% endif %}If anyone is seen, Red knows the package is coming: the climb-out SAMs come up at once, the northern alert launches, and if HAMMER hasn't hit yet, so does Kutaisi. Inside {{ pop_nm }} nm of the portal you may climb for the attack: Red will know where you are when the first bomb lands anyway.
 
-This applies to every Blue jet, escorts included. **DODGE stays west of the GATE until the first bomb lands.**
+This applies to every Blue jet in the package.
 
 ## Timing: HAMMER and the window
 
@@ -48,13 +48,17 @@ The blast door is a small target: a bomb counts only if it lands within **{{ hit
 
 Each Hornet carries two GBU-12s and a LITENING pod, so one jet can do both, one bomb after the other or as a pair on the same laser spot. The plan: Enfield 1-1 breaches at TOT, Enfield 1-2 follows ten seconds behind to put the second bomb through, and Springfield arrives 30 seconds after TOT to finish anything that's left. Players shoot when they have the shot.
 
+**HATCHET**, a special forces team, is dug in on the ridge {{ team_km }} km from the portal, on the highest ground there that can see the blast door. On your call (**F10 > Deep Cut > Hatchet: laser on the door**) they lase it on code 1688 until you call terminate or the store is destroyed. With HATCHET lasing, you can fly the pop-up and drop without working the pod; flying alone, that's the easier way to do it. Self-lasing works too.
+
 The TGT waypoint is the planned point. The mission places the portal on the actual gorge floor at mission start. The exact coordinates are sent at start and in **F10 > Deep Cut > Target coordinates**, and the F10 map draws the gorge floor from the GATE to the portal. Enter the coordinates as a waypoint or markpoint before you push.
 
 ## Getting out
 
 After the attack the {{ sam_names | join(" and ") }} come up on the high ground around the portal, and their envelopes cover the climb out of the gorge. Get back on the floor and fly the gorge out the way you came, or use the HARMs on the radars before you climb. Expect {{ gun2 }} fire and MANPADS on the way down the gorge.
 
-The Kutaisi alert launches at about {{ south_up }} (earlier if you are early or seen) and heads for the gorge mouth and the coast, which is your way home. DODGE, the F-14 escort, owns that fight. If no human is flying DODGE by {{ escort_check }}, MAGIC puts FORD, two AI Tomcats, on the escort station.
+The Kutaisi alert launches at about {{ south_up }} (earlier if you are early or seen) and heads for the gorge mouth and the coast, which is your way home. Nobody is coming to fight them for you: each Hornet has two AIM-9Xs and an AMRAAM, and MAGIC calls the picture. The quicker you are out of the gorge, the less of that fight there is.
+
+**A pilot down.** A pilot who ejects over land is hidden by HATCHET overnight. The summary then tells you to fly **Operation_Deep_Cut_Escape.miz** to bring them home. A pilot who ejects over the water is picked up by the Navy.
 
 ## Scoring
 
@@ -76,7 +80,7 @@ The summary after the last jet is down gives you a score out of 100.
 
 ## Players
 
-Enfield 1-1 is flyable in single player; one Hornet can win this on its own. In multiplayer, Enfield and Springfield are two pairs of strike Hornets and Dodge is a pair of F-14Bs. All six start cold on the deck.
+Enfield 1-1 is flyable in single player; one Hornet can win this on its own. In multiplayer, Enfield and Springfield are two pairs of strike Hornets. All four start cold on the deck.
 <!-- /ingame -->
 
 <!-- task -->
@@ -87,7 +91,6 @@ Enfield 1-1 is flyable in single player; one Hornet can win this on its own. In 
 | Event | Local |
 |---|---|
 | Mission start, cold on the deck | {{ start }} |
-| Escort check: FORD launches if no DODGE is airborne | {{ escort_check }} |
 | HAMMER: TLAMs cut the Kutaisi runway | {{ hammer }} |
 | Window opens | {{ win_on }} |
 | **TOT: blast door** | **{{ tot }}** |
@@ -104,12 +107,12 @@ Enfield 1-1 is flyable in single player; one Hornet can win this on its own. In 
 | Callsign | Who | |
 |---|---|---|
 | ENFIELD, SPRINGFIELD | Strike Hornets, two pairs | 251.0 AM |
-| DODGE | Escort F-14Bs (FORD if AI) | 251.0 AM |
+| HATCHET | Special forces team on the ridge, lases the door on call | F10 menu |
 | MAGIC | E-2C, calls the floor, the SAMs and the fighters | 255.0 AM |
 | ARCO | S-3B tanker | 251.0 AM, TACAN 60Y |
 | MOTHER | CVN-74 Stennis | 127.5, TACAN 74X, ICLS 11 |
 
-F10 > Deep Cut: **Time check** (TOT, HAMMER, floor and SAM state), **Target coordinates** (the portal's exact position), **Mission summary now**.
+F10 > Deep Cut: **Time check** (TOT, HAMMER, floor and SAM state), **Target coordinates** (the portal's exact position), **Hatchet: laser on the door**, **Hatchet: terminate**, **Mission summary now**.
 
 </div>
 <!-- /task -->
@@ -148,24 +151,11 @@ F10 > Deep Cut: **Time check** (TOT, HAMMER, floor and SAM state), **Target coor
 
 <div class="keep" markdown="1">
 
-## Route card: Dodge
-
-| WP | Name | Coordinates | Altitude | Leg | Course |
-|---|---|---|---|---|---|
-{% for r in escort_route %}
-| {{ r.wp }} | {{ r.name }} | {{ r.coords }} | {{ r.alt }} | {{ r.leg }} | {{ r.course }} |
-{% endfor %}
-
-</div>
-
-<div class="keep" markdown="1">
-
 ## Loadouts
 
-| Station | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
-|---|---|---|---|---|---|---|---|---|---|---|
-| F/A-18C | {{ strike_load[:9] | join(" | ") }} | |
-| F-14B | {{ escort_load | join(" | ") }} |
+| Station | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |
+|---|---|---|---|---|---|---|---|---|---|
+| F/A-18C | {{ strike_load[:9] | join(" | ") }} |
 
 <p class="small">Laser code 1688 on every Hornet. Fuel full internal plus tanks. Chaff 60, flares 30: the gorge is MANPADS country.</p>
 

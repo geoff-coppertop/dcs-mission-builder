@@ -1,7 +1,8 @@
 # Operation Deep Cut
 
-A standalone low-level strike on the Caucasus map for up to six players: two pairs of F/A-18C strike Hornets and a
-pair of F-14B escorts, all cold on the deck of the John C. Stennis. One Hornet can fly it alone.
+A low-level strike on the Caucasus map for up to four players, two pairs of F/A-18C strike Hornets cold on the
+deck of the John C. Stennis, with a follow-up if a pilot goes down over land. One Hornet can fly it alone: HATCHET,
+a special forces team on the ridge, lases the target on call so a solo pilot only has to fly and drop.
 
 Red has dug a hardened missile store into the wall of the upper Enguri gorge near Khaishi. The only way in is the
 tunnel portal on the gorge floor. The strike coasts in at the Enguri mouth, follows the river to Jvari and flies up
@@ -15,6 +16,7 @@ behind them and fighters heading for the gorge mouth.
 |---|---|
 | `Operation_Deep_Cut.miz` | Standard: 500 ft floor with a warning, ±45 s window, 90 s to make the kill, SA-6 and SA-8 at the climb-out, MiG-29s and MiG-21s |
 | `Operation_Deep_Cut_Hard.miz` | Hard: 300 ft floor, no warning, ±30 s window, 60 s for the kill, SA-11 and SA-15/SA-8, a ZSU-23-4 in the gorge, MiG-29s and Su-27s, Kutaisi back up sooner |
+| `Operation_Deep_Cut_Escape.miz` | Follow-up, flown when a pilot ejects over land in either variant: a captured F-14B cold at Senaki-Kolkhi, get airborne before the guards notice and outrun two MiG-29s to the coast, where CHEVY holds CAP. 1 player, or 2 with a RIO |
 
 ## What drives it
 
@@ -27,9 +29,13 @@ behind them and fighters heading for the gorge mouth.
   the same distance inside the kill window destroys the store. One bomb can't do both.
 - **Survival is scored.** The summary scores 100 points: 40 target, 20 timing (on time, unseen), 40 shared across every
   player jet that launches and lands (aboard or a divert). The store must be destroyed for SUCCESS or TEXTBOOK.
-- **AI escort backfill.** If no human Tomcat is airborne 15 minutes before TOT, FORD (two AI F-14Bs) takes the escort station.
+- **HATCHET.** Spawned at start on the highest ground 1.2–3 km from the portal that has line of sight to it, hidden and
+  immortal. F10 > Deep Cut > Hatchet: laser on the door (code 1688); off on terminate or when the store is destroyed.
+- **Nobody escorts the egress.** The Hornets carry two AIM-9X and an AMRAAM each, and MAGIC calls the fighters.
+- **A pilot down over land** is sent to `Operation_Deep_Cut_Escape.miz` in the summary; over the water, the Navy picks them up.
 
-Flags at the end: 90 = 1 textbook, 2 success, 3 partial, 4 failure; 92 = the score.
+Flags at the end: 90 = 1 textbook, 2 success, 3 partial, 4 failure; 91 = a pilot is down over land; 92 = the score.
+Escape sets 90 = 1 home, 2 down over the water, 3 down over land.
 
 ## Placement on DCS terrain
 
@@ -49,7 +55,8 @@ From the repository root: `python build.py deep_cut`. See the [main README](../.
 
 | Source | What it builds |
 |---|---|
-| `build_deep_cut.py`, `lua/deep_cut.lua` | Both variants (uses the shared `lua/common.lua`) |
-| `briefings/deep_cut.md`, `context.py` | Briefings |
-| `maps_deep_cut.py` | Theater and gorge maps |
-| `tests/test_deep_cut.py` | Scenario tests against the built `.miz`, including placement on a synthetic gorge |
+| `build_deep_cut.py`, `lua/deep_cut.lua` | Both strike variants (uses the shared `lua/common.lua`) |
+| `build_escape.py`, `lua/escape.lua` | The escape follow-up (uses `lua/common.lua` and `lua/cap.lua`) |
+| `briefings/*.md`, `context.py` | Briefings |
+| `maps_deep_cut.py` | Theater, gorge and escape maps |
+| `tests/` | Scenario tests against the built `.miz` files, including placement on a synthetic gorge |

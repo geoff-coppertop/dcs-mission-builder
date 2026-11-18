@@ -49,7 +49,7 @@ def deep_cut(miz, work):
     c = d["cfg"]
     hard = "(HARD)" in c
     n = {k: cfg_num(c, k) for k in ("START", "TOT", "WINDOW", "HAMMER", "REPAIR", "SAM_UP", "REACT", "KILL_WINDOW",
-                                   "FLOOR_FT", "GRACE", "DET_R", "POP_R", "ESCORT_CHECK", "ALERT_REACT", "BREACH_R",
+                                   "FLOOR_FT", "GRACE", "DET_R", "POP_R", "ALERT_REACT", "BREACH_R", "TEAM_R_MIN", "TEAM_R_MAX",
                                    "PTS_BREACH", "PTS_KILL", "PTS_ONTIME", "PTS_UNSEEN", "PTS_SURVIVAL")}
     tot = n["TOT"]
     en = d["groups"]["Enfield"]["route"]
@@ -75,7 +75,7 @@ def deep_cut(miz, work):
         south_up=hms(n["HAMMER"] + n["REPAIR"]), sam_up=hms(tot + n["SAM_UP"]), sam_up_s=int(n["SAM_UP"]),
         react=int(n["REACT"]), kill_window=int(n["KILL_WINDOW"]), floor_ft=int(n["FLOOR_FT"]), grace=int(n["GRACE"]),
         warn="WARN = true" in c, hit_r=int(n["BREACH_R"]), det_nm=f"{n['DET_R'] / NM:.0f}", pop_nm=f"{n['POP_R'] / NM:.1f}",
-        alert_react=int(n["ALERT_REACT"]), escort_check=hm(n["ESCORT_CHECK"]),
+        alert_react=int(n["ALERT_REACT"]), team_km=f"{n['TEAM_R_MIN'] / 1000:.1f}–{n['TEAM_R_MAX'] / 1000:.0f}",
         south_kind=south_kind, north_kind=north_kind,
         sam_names=[s[0].replace("Climb-out ", "") for s in sam], valley=[(s[0], s[5]) for s in valley],
         gun2="ZSU-23-4" if any("ZSU" in t for s in valley for t in s[5]) else "ZU-23",
@@ -83,6 +83,16 @@ def deep_cut(miz, work):
         gate_tgt_nm=f"{gate_tgt:.0f}", canyon_nm=f"{canyon:.0f}", coast_gate_nm=f"{coast_gate:.0f}", run_min=f"{run_min:.0f}",
         pts=dict(breach=int(n["PTS_BREACH"]), kill=int(n["PTS_KILL"]), ontime=int(n["PTS_ONTIME"]),
                  unseen=int(n["PTS_UNSEEN"]), survival=int(n["PTS_SURVIVAL"])),
-        route=route(d, "Enfield", times), escort_route=route(d, "Dodge"),
-        strike_load=loadout(d, "Enfield"), escort_load=loadout(d, "Dodge"),
+        route=route(d, "Enfield", times), strike_load=loadout(d, "Enfield"),
     )
+
+
+def escape(miz, work):
+    d = parse_miz(miz)
+    c = d["cfg"]
+    start, disc, react = cfg_num(c, "START"), cfg_num(c, "DISCOVER"), cfg_num(c, "ALERT_REACT")
+    en = d["groups"]["Enfield"]
+    fuel_lb = None
+    return dict(miz=Path(miz).name, start=hm(start), start_z=hms(start - ZULU), discover=hms(start + disc),
+                discover_min=round(disc / 60), react=int(react), notice=int(cfg_num(c, "TAKEOFF_NOTICE")),
+                route=route(d, "Enfield"), load=loadout(d, "Enfield"))

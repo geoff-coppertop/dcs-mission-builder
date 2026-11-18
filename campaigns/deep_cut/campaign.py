@@ -8,12 +8,15 @@ from missionbuilder import briefing
 MISSIONS = [
     ("Operation_Deep_Cut.miz", "deep_cut.md", "deep_cut", "Operation Deep Cut"),
     ("Operation_Deep_Cut_Hard.miz", "deep_cut.md", "deep_cut", "Operation Deep Cut (hard)"),
+    ("Operation_Deep_Cut_Escape.miz", "escape.md", "escape", "Operation Deep Cut: Escape"),
 ]
+TESTS = {"Operation_Deep_Cut_Escape.miz": "tests/test_escape.py"}
 ROOT = Path(__file__).resolve().parents[2]
 
 
 def missions(c):
     c.run("build_deep_cut.py", quiet=True)
+    c.run("build_escape.py", quiet=True)
     for m in MISSIONS:
         assert (c.out / m[0]).exists(), m[0]
     print(f"   {len(MISSIONS)} missions in {c.out.relative_to(c.out.parents[1])}")
@@ -52,5 +55,5 @@ def tests(c):
     for lua in ("lua51", "lua55"):
         c.env["NG_LUA"] = lua
         for m in MISSIONS:
-            log = c.run("tests/test_deep_cut.py", c.out / m[0], quiet=True)
+            log = c.run(TESTS.get(m[0], "tests/test_deep_cut.py"), c.out / m[0], quiet=True)
             print(f"   [{lua}] {m[0]}: {log.strip().splitlines()[-1]}")

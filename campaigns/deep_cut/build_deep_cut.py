@@ -1,4 +1,4 @@
-"""Build Operation_Deep_Cut.miz and Operation_Deep_Cut_Hard.miz (Caucasus; F/A-18C strike, F-14B escort; 1-6 players).
+"""Build Operation_Deep_Cut.miz and Operation_Deep_Cut_Hard.miz (Caucasus; F/A-18C strike; 1-4 players).
 
 python3 build_deep_cut.py            -> both variants
 python3 build_deep_cut.py hard       -> one
@@ -12,7 +12,7 @@ import datetime
 import sys
 
 from dcs import task, mapping
-from dcs.planes import FA_18C_hornet as HN, F_14B, MiG_21Bis, MiG_29S, Su_27
+from dcs.planes import FA_18C_hornet as HN, MiG_21Bis, MiG_29S, Su_27
 from dcs.unit import Skill
 
 from missionbuilder.builder import Builder, W, FT, KTS
@@ -21,7 +21,6 @@ from missionbuilder.red_arms import arm
 
 START = datetime.datetime(2027, 1, 14, 10, 0, 0)     # winter, mid-morning (Caucasus local = Z+4)
 TOT_OFFSET = 40 * 60
-ESCORT_CHECK_BEFORE = 15 * 60                        # AI escort takes over if no human Tomcat is airborne by TOT-15
 
 VARIANTS = {
     "standard": dict(file="Operation_Deep_Cut.miz", title="Operation Deep Cut", tag="",
@@ -49,7 +48,6 @@ NARROWS = (42.850, 42.090)
 BEND = (42.900, 42.140)
 TGT = (42.952, 42.195)             # planned portal, near Khaishi
 PUSH = (42.320, 41.250)            # over the sea, short of the coast
-COVER = (42.550, 41.720)           # escort station, west of the gate
 TANKER = (42.300, 40.950)
 NORTH_SPAWN = (43.150, 42.450)     # over the main range
 
@@ -67,12 +65,11 @@ def build(key):
     tot = s0 + TOT_OFFSET
     hammer = tot - 180
     pts = {k: P(*ll) for k, ll in dict(FEET_DRY=FEET_DRY, RIVER=RIVER, GATE=GATE, DAM=DAM, RESERVOIR=RESERVOIR,
-                                       NARROWS=NARROWS, BEND=BEND, TGT=TGT, PUSH=PUSH, COVER=COVER,
+                                       NARROWS=NARROWS, BEND=BEND, TGT=TGT, PUSH=PUSH,
                                        TANKER=TANKER).items()}
     tgt = pts["TGT"]
     det_r = round(tgt.distance_to_point(pts["GATE"]) + 2000, -2)
     pop_r = 7000
-    assert tgt.distance_to_point(pts["COVER"]) > det_r + 10_000, "escort station must be outside the radar-floor zone"
 
     b.carrier(recovery_min=65)
     cvn = b.cvn_start
@@ -100,34 +97,8 @@ def build(key):
              eta={"TGT": TOT_OFFSET})
     b.flight("Springfield", HN, [strike, strike], strike_route(), 2, [Skill.Client, Skill.Client],
              eta={"TGT": TOT_OFFSET + 30})
-    cat = {1: F_14B.Pylon1.LAU_138_AIM_9M, 2: F_14B.Pylon2.AIM_54C_Mk60_, 3: F_14B.Pylon3.Fuel_tank_300_gal_,
-           4: F_14B.Pylon4.AIM_7M_, 6: F_14B.Pylon6.AIM_7M_, 8: F_14B.Pylon8.Fuel_tank_300_gal_,
-           9: F_14B.Pylon9.AIM_54C_Mk60__, 10: F_14B.Pylon10.LAU_138_AIM_9M}
-    b.flight("Dodge", F_14B, [cat, cat],
-             [("DEPART", cvn.point_from_heading(45, 18_000), 8000, 350),
-              ("COVER", pts["COVER"], 22000, 420),
-              ("SWEEP", pts["RIVER"], 22000, 450),
-              ("FEET WET", pts["FEET_DRY"], 20000, 420),
-              ("TANKER", pts["TANKER"], 15000, 300)],
-             5, [Skill.Client, Skill.Client], maintask=task.CAP)
     b.tanker(pts["TANKER"])
     b.awacs()
-
-    # FORD: AI Tomcats, activated by the script only if no human Tomcat is airborne by the check time
-    ford = b.m.flight_group_inflight(b.usa, "Ford", F_14B, pts["COVER"].point_from_heading(250, 15_000),
-                                     altitude=22000 * FT, speed=420 * KTS, maintask=task.CAP, group_size=2)
-    ford.late_activation = True
-    ford.points[0].tasks = [t for t in ford.points[0].tasks if not isinstance(t, task.CAPTaskAction)]
-    for i, u in enumerate(ford.units, start=1):
-        u.name, u.skill = f"Ford 1-{i}", Skill.Good
-        u.callsign_dict = {1: 6, 2: 1, 3: i, "name": f"Ford1{i}"}
-        u.pylons.clear()
-        for st, store in cat.items():
-            u.load_pylon(store, st)
-    cw = ford.add_waypoint(pts["COVER"], 22000 * FT, 420 * KTS, name="COVER")
-    cw.tasks.append(task.EngageTargetsInZone(position=mapping.Vector2(pts["COVER"].x, pts["COVER"].y), radius=70_000,
-                                             targets=[task.Targets.All.Air]))
-    cw.tasks.append(task.OrbitAction(altitude=22000 * FT, speed=420 * KTS, pattern=task.OrbitAction.OrbitPattern.Circle))
 
     # ------------------------------------------------------------ Red fighters (late-activated; the script launches them)
     def fighters(name, kind, at, alt_m, goal, radius):
@@ -186,8 +157,9 @@ def build(key):
   CANYON = {{ {canyon_lua} }},
   SOUTH_GROUP = "Red South", NORTH_GROUP = "Red North", SOUTH_KIND = "{v['south'][2]}", NORTH_KIND = "{v['north'][2]}",
   SOUTH_BASE = "Kutaisi", ALERT_REACT = 90,
-  ESCORT_PREFIX = "Dodge", ESCORT_AI = "Ford", ESCORT_CHECK = {tot - ESCORT_CHECK_BEFORE},
-  JETS = {{ "Enfield 1-1", "Enfield 1-2", "Springfield 1-1", "Springfield 1-2", "Dodge 1-1", "Dodge 1-2" }},
+  TEAM = "Hatchet", TEAM_R_MIN = 1200, TEAM_R_MAX = 3000, LASER_CODE = 1688,
+  JETS = {{ "Enfield 1-1", "Enfield 1-2", "Springfield 1-1", "Springfield 1-2" }},
+  NEXT_ESCAPE = "Operation_Deep_Cut_Escape.miz", RESCUE_FLAG = "91",
   PTS_BREACH = 15, PTS_KILL = 25, PTS_ONTIME = 12, PTS_UNSEEN = 8, PTS_SURVIVAL = 40,
   OUTCOME_FLAG = "90", SCORE_FLAG = "92",
 }}

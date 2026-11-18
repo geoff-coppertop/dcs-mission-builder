@@ -14,7 +14,7 @@ def suite(path):
     SCRIPTS = scripts_from_miz(path)
     cfg = SCRIPTS[-1]
     V = {k: num(cfg, k) for k in ("START", "TOT", "WINDOW", "HAMMER", "REPAIR", "SAM_UP", "REACT", "KILL_WINDOW",
-                                  "FLOOR_FT", "GRACE", "DET_R", "POP_R", "ESCORT_CHECK", "ALERT_REACT")}
+                                  "FLOOR_FT", "GRACE", "DET_R", "POP_R", "ALERT_REACT")}
     TX, TZ = (float(v) for v in re.search(r"TGT = \{ x = (-?[\d.]+), z = (-?[\d.]+)", cfg).groups())
     hard = "(HARD)" in cfg
     # A V-shaped gorge running NE-SW, its floor 800 m south-east of the planned target point:
@@ -34,7 +34,6 @@ FLOOR_OFF = function(x, z) local dx, dz = x - OX, z - OZ return math.abs(-dx * U
     setup = terrain + f"""
 M.mkGroup("Red South", {{ M.mkUnit("Red South 1", {TX} - 70000, {TZ} + 30000), M.mkUnit("Red South 2", {TX} - 70000, {TZ} + 30100) }})
 M.mkGroup("Red North", {{ M.mkUnit("Red North 1", {TX} + 25000, {TZ} + 20000) }})
-M.mkGroup("Ford", {{ M.mkUnit("Ford 1-1", {TX} - 60000, {TZ} - 60000) }})
 -- players start far out at sea, well outside the radar-floor zone
 LEAD = M.player("Geoff", "Enfield 1-1", {TX} - 90000, {TZ} - 90000, 45, 1000)
 WING = M.player("Wing", "Enfield 1-2", {TX} - 90100, {TZ} - 90000, 45, 1000)
@@ -75,6 +74,9 @@ function trap(u) M.event({ id = world.event.S_EVENT_LAND, initiator = u, place =
             assert s.at.y > 1200, s.at.y          # on the high ground, not the floor
         assert "TARGET: blast door" in t and "MGRS" in t
         assert any("PORTAL (gorge floor" in M.marks[i].text for i in range(1, len(M.marks) + 1))
+        team = M.units["Hatchet"]
+        assert team is not None and L.globals().land.getHeight({"x": team.p.x, "y": team.p.z}) > d.tgt.y + 300
+        assert "Hatchet:SetInvisible" in [M.opts[i] for i in range(1, len(M.opts) + 1)]
         opts = [M.opts[i] for i in range(1, len(M.opts) + 1)]
         assert any(o.startswith("Climb-out") and o.endswith("=4") for o in opts)     # SAMs start on weapon hold
     run("Target and sites placed on DCS terrain", "M.advance(START + 10)", c_snap)
@@ -82,12 +84,13 @@ function trap(u) M.event({ id = world.event.S_EVENT_LAND, initiator = u, place =
     def c_textbook(L, M, t):
         for s in ["HAMMER: TLAMs impacting Kutaisi", "Shack! The blast door is down. Breach ON TIME",
                   "Through the portal! Secondaries", "TARGET DESTROYED", "climb-out SAMs are UP (bombs on the portal)",
-                  "Ford, two AI Tomcats", "Target 40/40", "Timing 20/20", "Survival 40/40: 2 of 2 jets home",
+                  "Target 40/40", "Timing 20/20", "Survival 40/40: 2 of 2 jets home",
                   "SCORE 100/100: TEXTBOOK", "Kutaisi has a strip open again"]:
             assert s in t, s
         assert "you're above the floor" not in t and "Red's radar" not in t
         assert M.flags["90"] == 1 and M.flags["92"] == 100
-        assert M.activated["Ford"] and M.activated["Red South"] and not M.activated["Red North"]
+        assert M.activated["Red South"] and not M.activated["Red North"]
+        assert "Also fly" not in t and M.flags["91"] is False
         assert len(M.explosions) == 2
     run("On time, unseen, breach and kill, all home", BOMB + """
 launch()
@@ -210,13 +213,31 @@ trap(LEAD)
 M.event({ id = world.event.S_EVENT_LAND, initiator = WING, place = { getName = function() return "Senaki-Kolkhi" end } })
 """, c_divert)
 
-    def c_escort(L, M, t):
-        assert not M.activated["Ford"] and "AI Tomcats" not in t
-    run("Human escort airborne: no AI escort", BOMB + """
-local TOM = M.player("Tom", "Dodge 1-1", -1, -1, 0, 7000)
-M.event({ id = world.event.S_EVENT_TAKEOFF, initiator = TOM })
-M.advance(ESCORT_CHECK + 5)
-""", c_escort)
+    def c_laser(L, M, t):
+        assert "HATCHET: Laser on the blast door, code 1688" in t and len(M.lasers) == 1
+        assert M.lasers[1].code == 1688 and M.lasers[1].dead       # off once the store is destroyed
+        assert "TARGET DESTROYED" in t
+    run("HATCHET lases on call, off after the kill", BOMB + """
+launch()
+M.advance(TOT - 60)
+M.cmds["Deep Cut/Hatchet: laser on the door"]()
+M.advance(TOT - 30)
+bomb(LEAD, TOT, 0, 0)
+bomb(LEAD, TOT, 1, 1)
+M.advance(TOT + 10)
+""", c_laser)
+
+    def c_eject(L, M, t):
+        assert "Also fly Operation_Deep_Cut_Escape.miz to bring the downed pilot home." in t
+        assert M.flags["91"] is True
+    run("A pilot down over land goes to the escape mission", BOMB + """
+launch()
+bomb(LEAD, TOT, 0, 0)
+bomb(LEAD, TOT, 1, 1)
+M.advance(TOT + 120)
+M.event({ id = world.event.S_EVENT_EJECTION, initiator = WING })
+trap(LEAD)
+""", c_eject)
 
     def c_same(L, M, t):
         assert "Shack!" in t and "TARGET DESTROYED" not in t
