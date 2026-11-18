@@ -35,6 +35,8 @@ FLOOR_OFF = function(x, z) local dx, dz = x - OX, z - OZ return math.abs(-dx * U
 M.mkGroup("Red South", {{ M.mkUnit("Red South 1", {TX} - 70000, {TZ} + 30000), M.mkUnit("Red South 2", {TX} - 70000, {TZ} + 30100) }})
 M.mkGroup("Red North", {{ M.mkUnit("Red North 1", {TX} + 25000, {TZ} + 20000) }})
 -- players start far out at sea, well outside the radar-floor zone
+M.mkGroup("Chevy", {{ M.mkUnit("Chevy 1-1", {TX} - 100000, {TZ} - 100000), M.mkUnit("Chevy 1-2", {TX} - 100100, {TZ} - 100000) }})
+M.mkGroup("CVN-74 Stennis", {{ M.mkUnit("CVN-74 Stennis", {TX} - 150000, {TZ} - 150000) }})
 LEAD = M.player("Geoff", "Enfield 1-1", {TX} - 90000, {TZ} - 90000, 45, 1000)
 WING = M.player("Wing", "Enfield 1-2", {TX} - 90100, {TZ} - 90000, 45, 1000)
 """
@@ -82,10 +84,10 @@ function trap(u) M.event({ id = world.event.S_EVENT_LAND, initiator = u, place =
     run("Target and sites placed on DCS terrain", "M.advance(START + 10)", c_snap)
 
     def c_textbook(L, M, t):
-        for s in ["HAMMER: TLAMs impacting Kutaisi", "Shack! The blast door is down. Breach ON TIME",
+        for s in ["HAMMER: TLAMs impacting the sector air defence command post", "Chevy 1-1, commit", "Shack! The blast door is down. Breach ON TIME",
                   "Through the portal! Secondaries", "TARGET DESTROYED", "climb-out SAMs are UP (bombs on the portal)",
                   "Target 40/40", "Timing 20/20", "Survival 40/40: 2 of 2 jets home",
-                  "SCORE 100/100: TEXTBOOK", "Kutaisi has a strip open again"]:
+                  "SCORE 100/100: TEXTBOOK", "Kutaisi has fighter control back on the backup radar", "CAP: Chevy committed"]:
             assert s in t, s
         assert "you're above the floor" not in t and "Red's radar" not in t
         assert M.flags["90"] == 1 and M.flags["92"] == 100
@@ -159,7 +161,7 @@ trap(LEAD); trap(WING)
 """, c_late)
 
     def c_early(L, M, t):
-        assert "Breach EARLY" in t and "Bombs on the gorge before HAMMER hit the runway" in t
+        assert "Breach EARLY" in t and "Bombs on the gorge before HAMMER took out their fighter control" in t
         assert M.activated["Red South"]
     run("Early, before HAMMER", BOMB + """
 launch()
@@ -248,7 +250,7 @@ M.advance(TOT + 30)
 """, c_same)
 
     def c_menu(L, M, t):
-        assert "Radar floor" in t and "HAMMER hits Kutaisi" in t
+        assert "Radar floor" in t and "HAMMER hits Red's fighter control" in t
     run("Time check", "M.advance(START + 60); M.cmds['Deep Cut/Time check']()", c_menu)
 
 

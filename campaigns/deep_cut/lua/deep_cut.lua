@@ -1,6 +1,7 @@
 -- Operation Deep Cut
 -- Low-level gorge strike on a tunnel portal: radar floor, TOT window opened by a TLAM strike (HAMMER) on the
--- Red fighter base, two-bomb breach-then-kill attack, SAMs at the climb-out, fighters on the egress, scored tiers.
+-- sector air defence command post and Kutaisi's fighter-control radar, two-bomb breach-then-kill attack, SAMs at
+-- the climb-out, fighters on the egress (CHEVY CAP offshore, cap.lua), scored tiers.
 -- HATCHET, a special forces team on the ridge, lases the portal on call. A pilot who ejects over land is
 -- sent to the follow-up, Operation Deep Cut: Escape.
 -- Requires common.lua (NG). Pure DCS scripting engine, Lua 5.1 compatible.
@@ -226,8 +227,10 @@ local function launch(which, why)
   if S[which] then return end
   S[which] = { t = timer.getAbsTime(), why = why }
   N.activate(g)
+  local kind = which == "south" and (C.SOUTH_KIND .. " off " .. C.SOUTH_BASE) or (C.NORTH_KIND .. " from the north")
   N.msg("MAGIC: Pop-up group, " .. (which == "south" and (C.SOUTH_KIND .. " off " .. C.SOUTH_BASE) or
         (C.NORTH_KIND .. " from the north, over the main range")) .. ", hot toward the gorge mouth. " .. why .. ".", 20)
+  N.capThreat(kind .. ", heading for the gorge mouth")
 end
 
 function T.scramble(which, why, delay)
@@ -239,7 +242,7 @@ function T.detected(name, agl)
   S.detected = { who = name, t = timer.getAbsTime(), agl = agl }
   N.msg(string.format("MAGIC: %s was seen above the floor at %d ft AGL. Red's radar has the package.\n" ..
         "Expect the climb-out SAMs up and fighters from the north.%s", name, math.floor(agl / FT + 0.5),
-        (not S.hammer) and (" HAMMER hasn't hit " .. C.SOUTH_BASE .. " yet: expect the " .. C.SOUTH_BASE .. " alert too.") or ""), 20)
+        (not S.hammer) and (" HAMMER hasn't hit yet: expect the " .. C.SOUTH_BASE .. " alert too.") or ""), 20)
   T.samsLive("package detected")
   T.scramble("north", "Red saw the package", C.ALERT_REACT)
   if not S.hammer then T.scramble("south", "Red saw the package before HAMMER", C.ALERT_REACT) end
@@ -316,7 +319,7 @@ function T.impact(p, t, shooter, id)
   if not S.firstImpact then
     S.firstImpact = t
     if t < C.HAMMER then
-      T.scramble("south", "Bombs on the gorge before HAMMER hit the runway", 0)
+      T.scramble("south", "Bombs on the gorge before HAMMER took out their fighter control", 0)
     end
     timer.scheduleFunction(function() T.samsLive("bombs on the portal") return nil end, nil, timer.getTime() + C.REACT)
   end
@@ -393,6 +396,7 @@ function T.summary()
   if S.detected then alerts[#alerts + 1] = "seen above the floor (" .. S.detected.who .. ")" end
   if S.samsLive then alerts[#alerts + 1] = "climb-out SAMs up: " .. S.samWhy end
   if S.south then alerts[#alerts + 1] = C.SOUTH_BASE .. " alert launched" end
+  local cap = N.capSummary()
   if S.north then alerts[#alerts + 1] = "northern alert launched" end
   trigger.action.setUserFlag(C.OUTCOME_FLAG, ({ TEXTBOOK = 1, SUCCESS = 2, PARTIAL = 3, FAILURE = 4 })[sc.grade])
   trigger.action.setUserFlag(C.SCORE_FLAG, sc.total)
@@ -405,6 +409,7 @@ function T.summary()
     string.format("Survival %d/%d: %d of %d jets home%s.\n", sc.survival, C.PTS_SURVIVAL, sc.home, sc.launched,
                   #sc.lost > 0 and (" (" .. table.concat(sc.lost, "; ") .. ")") or "") ..
     (#alerts > 0 and ("Red: " .. table.concat(alerts, "; ") .. ".\n") or "Red never reacted.\n") ..
+    (cap ~= "" and (cap .. "\n") or "") ..
     string.format("\nSCORE %d/100: %s.", sc.total, sc.grade) .. rescue, 90)
 end
 
@@ -415,8 +420,8 @@ function T.timeCheck()
   local state
   if S.kill then state = "Target destroyed. Egress."
   elseif S.breach then state = "Door down, " .. math.max(0, math.floor(S.sealAt - now + 0.5)) .. " s to put a bomb through."
-  elseif now < C.HAMMER then state = "HAMMER hits " .. C.SOUTH_BASE .. " at " .. N.hms(C.HAMMER) .. "L. Don't arrive early."
-  else state = "HAMMER is in. " .. C.SOUTH_BASE .. " alert grounded until about " .. N.hms(C.HAMMER + C.REPAIR) .. "L." end
+  elseif now < C.HAMMER then state = "HAMMER hits Red's fighter control at " .. N.hms(C.HAMMER) .. "L. Don't arrive early."
+  else state = "HAMMER is in. " .. C.SOUTH_BASE .. " alert held on the ground until about " .. N.hms(C.HAMMER + C.REPAIR) .. "L." end
   N.msg(string.format("Time %s\nTOT %s (%s), window +/-%d s\n%s\nRadar floor %d ft AGL: %s. Climb-out SAMs: %s.",
     N.clock(now), N.clock(C.TOT), d >= 0 and ("in " .. N.mmss(d):sub(2)) or (N.mmss(-d):sub(2) .. " ago"), C.WINDOW, state,
     C.FLOOR_FT, S.detected and "DETECTED" or "not seen", S.samsLive and "UP" or "quiet"), 15)
@@ -461,10 +466,11 @@ function T.init()
 
   at(C.HAMMER, function()
     S.hammer = true
-    N.msg("HAMMER: TLAMs impacting " .. C.SOUTH_BASE .. ". Runway cut, the alert is on the ground for about " ..
+    N.msg("HAMMER: TLAMs impacting the sector air defence command post and " .. C.SOUTH_BASE .. "'s fighter-control radar.\n" ..
+          "MAGIC: " .. C.SOUTH_BASE .. " can't launch without control. Expect the backup up in about " ..
           math.floor(C.REPAIR / 60 + 0.5) .. " minutes. Window " .. N.hms(C.TOT - C.WINDOW) .. "-" .. N.hms(C.TOT + C.WINDOW) .. "L.", 20)
   end)
-  at(C.HAMMER + C.REPAIR, function() launch("south", C.SOUTH_BASE .. " has a strip open again") end)
+  at(C.HAMMER + C.REPAIR, function() launch("south", C.SOUTH_BASE .. " has fighter control back on the backup radar") end)
   at(C.TOT + C.WINDOW + 1, function()
     if not S.breach then N.msg("MAGIC: Window closed, no breach. Every minute in that gorge costs you now.", 15) end
   end)

@@ -88,16 +88,31 @@ def c_intercept(L, M, t, opts):
     assert "Tally one Tomcat" in t and "OUTCOME: SUCCESS" in t and "Identified by CHEVY" in t
 run("No check-in: CHEVY intercepts and identifies", """
 M.event({ id = world.event.S_EVENT_TAKEOFF, initiator = JET })
-M.advance(START + 60)
+M.advance(START + 30)
 JET.p = { x = -20000, y = 1500, z = -60000 }
-M.advance(START + 75)
+M.advance(START + 35)
 local c = M.units["Chevy 1-1"]
 c.p = { x = -20500, y = 1500, z = -61000 }
-M.advance(START + 95)
+M.advance(START + 50)
 JET.p = { x = -20000, y = 1500, z = -110000 }
-M.advance(START + 100)
+M.advance(START + 55)
 M.event({ id = world.event.S_EVENT_LAND, initiator = JET, place = M.carrier() })
 """, c_intercept)
+
+
+def c_recommit(L, M, t, opts):
+    assert "break off the unknown Tomcat" in t and "Chevy is busy with the MiGs" in t
+    assert "back to the unknown Tomcat" in t and "Tally one Tomcat" in t
+run("MiGs pull CHEVY off; it comes back for the ID", """
+M.event({ id = world.event.S_EVENT_TAKEOFF, initiator = JET })
+M.advance(START + 30)
+JET.p = { x = -20000, y = 1500, z = -60000 }
+M.advance(START + REACT + 25)
+M.units["Red South 1"].alive = false; M.units["Red South 2"].alive = false
+M.advance(START + REACT + 25 + 75)
+M.units["Chevy 1-1"].p = { x = -20500, y = 1500, z = -61000 }
+M.advance(START + REACT + 25 + 95)
+""", c_recommit)
 
 
 def c_unknown_trap(L, M, t, opts):

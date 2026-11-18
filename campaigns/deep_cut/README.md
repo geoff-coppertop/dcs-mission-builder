@@ -16,22 +16,26 @@ behind them and fighters heading for the gorge mouth.
 |---|---|
 | `Operation_Deep_Cut.miz` | Standard: 500 ft floor with a warning, ±45 s window, 90 s to make the kill, SA-6 and SA-8 at the climb-out, MiG-29s and MiG-21s |
 | `Operation_Deep_Cut_Hard.miz` | Hard: 300 ft floor, no warning, ±30 s window, 60 s for the kill, SA-11 and SA-15/SA-8, a ZSU-23-4 in the gorge, MiG-29s and Su-27s, Kutaisi back up sooner |
-| `Operation_Deep_Cut_Escape.miz` | Follow-up, flown when a pilot ejects over land in either variant: steal Red's alert F-14A (an F-14A-135-GR in ex-export paint) cold at Senaki-Kolkhi, get airborne before the guards notice and outrun two MiG-29s to the coast, where CHEVY holds CAP. 1 player, or 2 with a RIO. Check in with MAGIC (code word KESTREL) or CHEVY intercepts you in the ID zone; trapping unidentified is only PARTIAL |
+| `Operation_Deep_Cut_Escape.miz` | Follow-up, flown when a pilot ejects over land in either variant: steal Red's F-14A (an F-14A-135-GR in ex-export paint), readied for a ferry flight: full fuel and tanks, gun only, start cart hooked up. The base is on alert after the raid (guards at +6 min, MiG-29s 60 s after you're seen). The pilot is the air wing commander, who flew F-14Ds before the type retired in 2006. Outrun the MiGs to the coast, where CHEVY holds CAP. 1 player, or 2 with a RIO. Check in with MAGIC (code word KESTREL) or CHEVY intercepts you in the ID zone; trapping unidentified is only PARTIAL |
 
 ## What drives it
 
 - **Radar floor.** From the gorge mouth to 3.8 nm from the portal, any player jet more than the floor height above
   the ground for a few seconds is seen: the climb-out SAMs come up, the northern alert launches, and before HAMMER the
   Kutaisi alert does too. Escorts count, so they hold west of the gorge until the first bomb.
-- **Timing.** HAMMER, a scripted TLAM strike, cuts the Kutaisi runway three minutes before TOT and keeps its alert on
-  the ground for a fixed time. Bombs before HAMMER launch it at once; a late breach finds the SAMs already up.
+- **Timing.** HAMMER, a scripted TLAM strike, destroys the sector air defence command post and Kutaisi's
+  fighter-control radar three minutes before TOT; Kutaisi's alert waits for the backup (10 minutes, 7 hard). Bombs
+  before HAMMER launch it at once; a late breach finds the SAMs already up. The briefing explains why this is a
+  manned strike rather than a Tomahawk one.
 - **Breach, then kill.** The first bomb within 15 m (12 m hard) of the blast door breaches it. A different bomb within
   the same distance inside the kill window destroys the store. One bomb can't do both.
 - **Survival is scored.** The summary scores 100 points: 40 target, 20 timing (on time, unseen), 40 shared across every
   player jet that launches and lands (aboard or a divert). The store must be destroyed for SUCCESS or TEXTBOOK.
 - **HATCHET.** Spawned at start on the highest ground 1.2–3 km from the portal that has line of sight to it, hidden and
   immortal. F10 > Deep Cut > Hatchet: laser on the door (code 1688); off on terminate or when the store is destroyed.
-- **Nobody escorts the egress.** The Hornets carry two AIM-9X and an AMRAAM each, and MAGIC calls the fighters.
+- **Egress cover.** CHEVY, an AI Hornet CAP over the water (`lua/cap.lua`), is committed when Red fighters launch.
+  The strike Hornets carry two AIM-9X and an AMRAAM each. Enfield 1-2 trails its lead by 30 s to stay out of the
+  fragments; Springfield attacks 45 s after TOT off a different heading.
 - **A pilot down over land** is sent to `Operation_Deep_Cut_Escape.miz` in the summary; over the water, the Navy picks them up.
 
 Flags at the end: 90 = 1 textbook, 2 success, 3 partial, 4 failure; 91 = a pilot is down over land; 92 = the score.

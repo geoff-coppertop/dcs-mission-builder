@@ -48,6 +48,7 @@ NARROWS = (42.850, 42.090)
 BEND = (42.900, 42.140)
 TGT = (42.952, 42.195)             # planned portal, near Khaishi
 PUSH = (42.320, 41.250)            # over the sea, short of the coast
+CAP = (42.300, 41.150)             # CHEVY's station, over the water off the Enguri mouth
 TANKER = (42.300, 40.950)
 NORTH_SPAWN = (43.150, 42.450)     # over the main range
 
@@ -65,7 +66,7 @@ def build(key):
     tot = s0 + TOT_OFFSET
     hammer = tot - 180
     pts = {k: P(*ll) for k, ll in dict(FEET_DRY=FEET_DRY, RIVER=RIVER, GATE=GATE, DAM=DAM, RESERVOIR=RESERVOIR,
-                                       NARROWS=NARROWS, BEND=BEND, TGT=TGT, PUSH=PUSH,
+                                       NARROWS=NARROWS, BEND=BEND, TGT=TGT, PUSH=PUSH, CAP=CAP,
                                        TANKER=TANKER).items()}
     tgt = pts["TGT"]
     det_r = round(tgt.distance_to_point(pts["GATE"]) + 2000, -2)
@@ -95,10 +96,13 @@ def build(key):
 
     b.flight("Enfield", HN, [strike, strike], strike_route(), 1, [Skill.Player, Skill.Client],
              eta={"TGT": TOT_OFFSET})
+    # Enfield 1-2 trails 30 s to stay out of its lead's fragments; Springfield attacks 45 s after TOT off a
+    # different heading (see the briefing), inside the kill window in both variants
     b.flight("Springfield", HN, [strike, strike], strike_route(), 2, [Skill.Client, Skill.Client],
-             eta={"TGT": TOT_OFFSET + 30})
+             eta={"TGT": TOT_OFFSET + 45})
     b.tanker(pts["TANKER"])
     b.awacs()
+    b.cap(pts["CAP"], commit_point=pts["FEET_DRY"])      # CHEVY: offshore, committed by MAGIC on the egress fighters
 
     # ------------------------------------------------------------ Red fighters (late-activated; the script launches them)
     def fighters(name, kind, at, alt_m, goal, radius):
@@ -164,6 +168,7 @@ def build(key):
   OUTCOME_FLAG = "90", SCORE_FLAG = "92",
 }}
 """
+    b.add_cap_scripts("the coast")
     b.add_script(read_lua("common.lua"))
     b.add_script(read_lua("deep_cut.lua"), cfg, keep_copy=f"deep_cut_{key}_built.lua")
     # Briefing text comes from briefings/deep_cut.md: build.py renders it and writes it into the .miz.

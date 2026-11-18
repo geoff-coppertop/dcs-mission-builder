@@ -1,5 +1,5 @@
 -- Operation Deep Cut: Escape (follow-up when a Deep Cut pilot ejects over land)
--- HATCHET has brought the downed pilot onto Senaki-Kolkhi, where Red keeps an alert F-14A. Start it, get
+-- HATCHET has brought the downed pilot onto Senaki-Kolkhi, where Red has an F-14A readied for a ferry flight. Start it, get
 -- airborne before the guards notice, and run for the boat with the Kutaisi alert behind you. CHEVY (cap.lua)
 -- holds at the coast. The Navy was told an escape was coming, not when: the jet is unknown until the pilot
 -- checks in with MAGIC (code word) or CHEVY gets eyes on it inside the ID zone, and Mother won't clear an
@@ -19,7 +19,7 @@ T.cfg = T.cfg or {
 }
 local C = T.cfg
 T.s = { found = nil, launched = nil, airborne = false, kills = 0, over = false,
-        authed = nil, unknown = nil, identified = nil, vid = 0, warned = 0, trapUnknown = false }
+        authed = nil, unknown = nil, identified = nil, vid = 0, warned = 0, trapUnknown = false, waitSaid = nil }
 local S = T.s
 
 function T.discover(why)
@@ -51,6 +51,11 @@ function T.checkIn()
         "You're friendly on our scope. Mother has you cleared in. Expect " .. CAPCTL.call() .. " to take a look on the way.", 20)
 end
 
+function T.commitIntercept(p)
+  CAPCTL.commit("request", { x = p.x, z = p.z }, LABEL, "unknown Tomcat inbound",
+                { clear = function() return known() and true or false end, timeout = 1800, radius = 30000 })
+end
+
 -- CHEVY has to see you: steer it to the jet every 10 s while it is committed on the unknown
 local function steer(gname, p)
   local g = Group.getByName(gname)
@@ -71,11 +76,22 @@ function T.idTick(_, t)
     S.unknown = timer.getAbsTime()
     N.msg(string.format("MAGIC: Unknown Tomcat, %d nm east of Mother, inbound. Not squawking anything we know.\n" ..
           "%s, intercept and identify. Weapons hold on the Tomcat.", math.floor(N.dist(p, cvp) / 1852 + 0.5), CAPCTL.call()), 20)
-    CAPCTL.commit("request", { x = p.x, z = p.z }, LABEL, "unknown Tomcat inbound",
-                  { clear = function() return known() and true or false end, timeout = 1800, radius = 30000 })
+    T.commitIntercept(p)
   end
   if S.unknown and not known() then
     local c = CAPCTL.cap
+    -- a higher-priority commit (the MiGs) drops the intercept in cap.lua: pick it up again once CHEVY is free
+    if c and not c.mode then
+      N.msg("MAGIC: " .. CAPCTL.call() .. ", back to the unknown Tomcat. Intercept and identify, weapons hold.", 12)
+      S.waitSaid = nil
+      T.commitIntercept(p)
+    elseif c and c.mode ~= "committed" or (c and c.task and c.task.label ~= LABEL) then
+      if S.waitSaid ~= (c and c.mode) then
+        S.waitSaid = c and c.mode
+        N.msg("MAGIC: Unknown Tomcat, " .. (c.mode == "out" and "there's nobody free to look at you" or
+              (CAPCTL.call() .. " is busy with the MiGs")) .. ". Stay outside 10 nm of Mother until you're identified, or authenticate.", 15)
+      end
+    end
     if c and c.mode == "committed" and c.task and c.task.label == LABEL then
       if (t % 10) < 2 then steer(c.group, p) end
       local close = false

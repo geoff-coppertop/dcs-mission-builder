@@ -1,6 +1,7 @@
 """Build Operation_Deep_Cut_Escape.miz: the follow-up flown when a Deep Cut pilot ejects over land.
 
-Red's own alert F-14A-135-GR, cold on the ramp at Senaki-Kolkhi (neutral field, Red guards around it). Get
+Red's F-14A-135-GR, readied for a ferry flight (full fuel and tanks, gun only, start cart hooked up), cold on
+the ramp at Senaki-Kolkhi (neutral field, Red guards around it, on alert the morning after the raid). Get
 airborne before you are seen, outrun the Kutaisi alert to the coast where CHEVY holds CAP, and land aboard CVN-74.
 The jet is in the Iran country, moved into the blue coalition, so DCS gives it its default ex-export paint.
 One jet, 1 player; in multiplayer a second player can take the RIO seat.
@@ -19,7 +20,8 @@ from missionbuilder.paths import read_lua
 from missionbuilder.red_arms import arm
 
 START = datetime.datetime(2027, 1, 15, 8, 50, 0)     # the next morning, just after sunrise
-DISCOVER = 8 * 60                                    # guards reach the jet this long after start
+DISCOVER = 6 * 60                                    # guards reach the jet this long after start (base on alert)
+ALERT_REACT = 60                                     # Kutaisi's alert is quick this morning
 COAST = (42.200, 41.640)                             # feet wet, south of the Enguri mouth
 
 
@@ -36,7 +38,7 @@ def build():
     b.awacs()
     b.cap(P(42.25, 41.25), commit_point=coast)
 
-    # Red's alert Tomcat, armed and fuelled for its own scramble
+    # Red's Tomcat, readied for a ferry flight: fuelled, tanks on, no missiles
     iran = b.m.coalition["red"].swap_country(b.m.coalition["blue"], "Iran")
     g = b.m.flight_group_from_airport(iran, "Enfield", F14A, field, maintask=task.CAP,
                                       start_type=dcs.mission.StartType.Cold, group_size=1)
@@ -44,8 +46,7 @@ def build():
     u.name, u.skill = "Enfield 1-1", Skill.Player
     u.callsign_dict = {1: 1, 2: 1, 3: 1, "name": "Enfield11"}
     u.pylons.clear()
-    for st, store in {1: F14A.Pylon1.LAU_138_AIM_9M, 2: F14A.Pylon2.AIM_7M, 3: F14A.Pylon3.Fuel_tank_300_gal_,
-                      8: F14A.Pylon8.Fuel_tank_300_gal_, 9: F14A.Pylon9.AIM_7M, 10: F14A.Pylon10.LAU_138_AIM_9M}.items():
+    for st, store in {3: F14A.Pylon3.Fuel_tank_300_gal_, 8: F14A.Pylon8.Fuel_tank_300_gal_}.items():
         u.load_pylon(store, st)
     u.fuel = F14A.fuel_max
     u.gun, u.chaff, u.flare = 100, 60, 30
@@ -84,7 +85,7 @@ def build():
     w.tasks.append(task.OrbitAction(altitude=4000, speed=850, pattern=task.OrbitAction.OrbitPattern.Circle))
 
     cfg = f"""T.cfg = {{
-  NAME = "OPERATION DEEP CUT: ESCAPE", START = {b.start_s}, DISCOVER = {DISCOVER}, TAKEOFF_NOTICE = 20, ALERT_REACT = 90,
+  NAME = "OPERATION DEEP CUT: ESCAPE", START = {b.start_s}, DISCOVER = {DISCOVER}, TAKEOFF_NOTICE = 20, ALERT_REACT = {ALERT_REACT},
   FIELD = "Senaki-Kolkhi", FIELD_AD = {{ "Senaki Guns North", "Senaki Guns South", "Senaki SA-13" }},
   SOUTH_GROUP = "Red South", SOUTH_KIND = "two MiG-29s", SOUTH_BASE = "Kutaisi",
   JET = "Enfield 1-1", OUTCOME_FLAG = "90",
