@@ -9,7 +9,7 @@ and comes with a briefing written in Markdown that becomes both the PDF and the 
 | Campaign | Aircraft | Missions | |
 |---|---|---|---|
 | [Operation Narrow Gate](campaigns/narrow_gate/README.md) | F/A-18C, 1–2 players | 8 files, branching on how each mission goes | [`dist/narrow_gate`](dist/narrow_gate) |
-| [Operation Deep Cut](campaigns/deep_cut/README.md) | F/A-18C, 1–4 players; F-14B follow-up | Low-level gorge strike, standard and hard, plus an escape mission if a pilot goes down over land | [`dist/deep_cut`](dist/deep_cut) |
+| [Operation Deep Cut](campaigns/deep_cut/README.md) | F/A-18C, 1–4 players; F-14A follow-up | Low-level gorge strike, standard and hard, plus an escape mission if a pilot goes down over land | [`dist/deep_cut`](dist/deep_cut) |
 
 To fly a campaign, copy its `dist/<campaign>/*.miz` files into `Saved Games/DCS/Missions` and open the first one.
 Each mission's summary tells you which file to fly next, and its `_Briefing.pdf` sits alongside it.

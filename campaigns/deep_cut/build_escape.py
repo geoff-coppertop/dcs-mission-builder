@@ -1,14 +1,15 @@
 """Build Operation_Deep_Cut_Escape.miz: the follow-up flown when a Deep Cut pilot ejects over land.
 
-A captured F-14B, cold on the ramp at Senaki-Kolkhi (neutral field, Red guards around it). Get airborne before
-you are seen, outrun the Kutaisi alert to the coast where CHEVY holds CAP, and land aboard CVN-74.
+Red's own alert F-14A-135-GR, cold on the ramp at Senaki-Kolkhi (neutral field, Red guards around it). Get
+airborne before you are seen, outrun the Kutaisi alert to the coast where CHEVY holds CAP, and land aboard CVN-74.
+The jet is in the Iran country, moved into the blue coalition, so DCS gives it its default ex-export paint.
 One jet, 1 player; in multiplayer a second player can take the RIO seat.
 """
 import datetime
 
 import dcs
 from dcs import task, mapping
-from dcs.planes import F_14B, MiG_29S
+from dcs.planes import F_14A_135_GR as F14A, MiG_29S
 from dcs.point import MovingPoint, PointAction, PointProperties
 from dcs.unit import Skill
 from dcs.vehicles import AirDefence
@@ -35,17 +36,19 @@ def build():
     b.awacs()
     b.cap(P(42.25, 41.25), commit_point=coast)
 
-    # the captured Tomcat: two AIM-9M and the gun, under half fuel
-    g = b.m.flight_group_from_airport(b.usa, "Enfield", F_14B, field, maintask=task.CAP,
+    # Red's alert Tomcat, armed and fuelled for its own scramble
+    iran = b.m.coalition["red"].swap_country(b.m.coalition["blue"], "Iran")
+    g = b.m.flight_group_from_airport(iran, "Enfield", F14A, field, maintask=task.CAP,
                                       start_type=dcs.mission.StartType.Cold, group_size=1)
     u = g.units[0]
     u.name, u.skill = "Enfield 1-1", Skill.Player
     u.callsign_dict = {1: 1, 2: 1, 3: 1, "name": "Enfield11"}
     u.pylons.clear()
-    u.load_pylon(F_14B.Pylon1.LAU_138_AIM_9M, 1)
-    u.load_pylon(F_14B.Pylon10.LAU_138_AIM_9M, 10)
-    u.fuel = round(F_14B.fuel_max * 0.45)
-    u.gun, u.chaff, u.flare = 100, 30, 15
+    for st, store in {1: F14A.Pylon1.LAU_138_AIM_9M, 2: F14A.Pylon2.AIM_7M, 3: F14A.Pylon3.Fuel_tank_300_gal_,
+                      8: F14A.Pylon8.Fuel_tank_300_gal_, 9: F14A.Pylon9.AIM_7M, 10: F14A.Pylon10.LAU_138_AIM_9M}.items():
+        u.load_pylon(store, st)
+    u.fuel = F14A.fuel_max
+    u.gun, u.chaff, u.flare = 100, 60, 30
     g.set_frequency(251.0)
     g.add_waypoint(fp.point_from_heading(270, 8000), 1500 * FT, 450 * KTS, name="RUN WEST")
     g.add_waypoint(coast, 1500 * FT, 480 * KTS, name="FEET WET")

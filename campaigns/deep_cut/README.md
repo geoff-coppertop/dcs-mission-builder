@@ -16,7 +16,7 @@ behind them and fighters heading for the gorge mouth.
 |---|---|
 | `Operation_Deep_Cut.miz` | Standard: 500 ft floor with a warning, ±45 s window, 90 s to make the kill, SA-6 and SA-8 at the climb-out, MiG-29s and MiG-21s |
 | `Operation_Deep_Cut_Hard.miz` | Hard: 300 ft floor, no warning, ±30 s window, 60 s for the kill, SA-11 and SA-15/SA-8, a ZSU-23-4 in the gorge, MiG-29s and Su-27s, Kutaisi back up sooner |
-| `Operation_Deep_Cut_Escape.miz` | Follow-up, flown when a pilot ejects over land in either variant: a captured F-14B cold at Senaki-Kolkhi, get airborne before the guards notice and outrun two MiG-29s to the coast, where CHEVY holds CAP. 1 player, or 2 with a RIO |
+| `Operation_Deep_Cut_Escape.miz` | Follow-up, flown when a pilot ejects over land in either variant: steal Red's alert F-14A (an F-14A-135-GR in ex-export paint) cold at Senaki-Kolkhi, get airborne before the guards notice and outrun two MiG-29s to the coast, where CHEVY holds CAP. 1 player, or 2 with a RIO |
 
 ## What drives it
 

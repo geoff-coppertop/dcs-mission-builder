@@ -2,14 +2,14 @@
 
 # Operation Deep Cut: Escape
 
-F-14B Tomcat · 1 player, or 2 with a RIO · Caucasus · escape and evasion in a captured jet · cold start at Senaki-Kolkhi, recovery aboard CVN-74
+F-14A Tomcat · 1 player, or 2 with a RIO · Caucasus · escape and evasion in a captured jet · cold start at Senaki-Kolkhi, recovery aboard CVN-74
 
 <div class="glance" markdown="1">
 
 | | | | |
 |---|---|---|---|
 | Start | **{{ start }} local**, cold on the ramp | Seen by | about **{{ discover }}**, or {{ notice }} s after you take off |
-| Jet | Captured F-14B, 2× AIM-9M, gun, under half fuel | Chasing | Two MiG-29s off Kutaisi, {{ react }} s after you're seen |
+| Jet | Red's alert F-14A, 2× AIM-9M, 2× AIM-7M, gun, full fuel and tanks | Chasing | Two MiG-29s off Kutaisi, {{ react }} s after you're seen |
 | Home | CVN-74 · 127.5 · TACAN 74X · ICLS 11 | Help | CHEVY CAP at the coast, ARCO, MAGIC |
 
 </div>
@@ -17,7 +17,9 @@ F-14B Tomcat · 1 player, or 2 with a RIO · Caucasus · escape and evasion in a
 <!-- ingame -->
 ## Situation
 
-You ejected over the gorge yesterday. HATCHET, the team on the ridge, reached you before Red did and moved you down the valley overnight. There's no helicopter coming this deep. Instead HATCHET has brought you to Senaki-Kolkhi, where Red has been keeping a Blue F-14B it captured after a divert last month. It is fuelled for engine runs, two Sidewinders are still on the rails, and nobody is guarding it closely.
+You ejected over the gorge yesterday. HATCHET, the team on the ridge, reached you before Red did and moved you down the valley overnight. There's no helicopter coming this deep. Instead HATCHET has brought you to Senaki-Kolkhi.
+
+Red flies a handful of second-hand F-14As, bought from an export customer and still in that customer's camouflage. One of them sits on alert at Senaki: fuelled, tanks on, armed with two Sparrows and two Sidewinders, ready for a crew that is asleep in the alert shack. Alert jets are kept ready to go in minutes, and that is what makes this one stealable. It's a Tomcat, close enough to the jets you trained on, and HATCHET has dealt with the crew chief.
 
 Nobody is watching this end of the ramp right now. HATCHET reckons the guards reach it about {{ discover_min }} minutes after you climb in, at **{{ discover }}**. If you're still on the ground then, the guns on the field open up.
 
@@ -29,8 +31,9 @@ Start the Tomcat, get airborne and get home to Mother.
 
 - **Get moving.** It's a cold start. The jet is noticed {{ notice }} seconds after you take off, or when the guards arrive, whichever comes first, or at once if you fire the gun on the field. Once it is noticed, the field's ZU-23s, a ZSU-23-4 and an SA-13 open up.
 - **The chase.** {{ react }} seconds after you're seen, Kutaisi's alert launches two MiG-29s at you. Kutaisi is about 25 nm east of the field, so they start close behind you.
-- **The run.** Head west, low and fast, to FEET WET on the coast. MAGIC commits CHEVY, two Hornets on CAP off the coast, onto the MiGs once they launch. Your two AIM-9Ms and the gun are for the moment it goes wrong.
-- **Fuel.** Under half internal, no tanks. ARCO is on its track if you need it before the trap.
+- **The run.** Head west, low and fast, to FEET WET on the coast. MAGIC commits CHEVY, two Hornets on CAP off the coast, onto the MiGs once they launch. The Sparrows and Sidewinders are there if the MiGs catch you first.
+- **Getting aboard.** Full fuel and two tanks. You'll be heavy for the trap: dump or burn down before you come aboard.
+- **Identification.** You're in a Red jet in Red paint. MAGIC and Mother know you're coming. Fly the route and talk to MAGIC.
 
 ## What happens next
 

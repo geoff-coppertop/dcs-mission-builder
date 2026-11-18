@@ -1,5 +1,5 @@
 -- Operation Deep Cut: Escape (follow-up when a Deep Cut pilot ejects over land)
--- HATCHET has brought the downed pilot onto Senaki-Kolkhi, where Red keeps a captured F-14B. Start it, get
+-- HATCHET has brought the downed pilot onto Senaki-Kolkhi, where Red keeps an alert F-14A. Start it, get
 -- airborne before the guards notice, and run for the boat with the Kutaisi alert behind you. CHEVY (cap.lua)
 -- holds at the coast. Requires common.lua (NG) and cap.lua (CAPCTL).
 
@@ -56,7 +56,7 @@ N.on(function(e)
   end
 end)
 
-function N.onTrap(pname) N.msg("MOTHER: " .. pname .. " aboard in a Tomcat nobody launched. Welcome home.", 20) end
+function N.onTrap(pname) N.msg("MOTHER: " .. pname .. " aboard in somebody else's Tomcat. Welcome home.", 20) end
 
 function N.onAllDown()
   if S.over then return end

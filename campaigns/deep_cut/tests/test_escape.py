@@ -38,7 +38,7 @@ def c_clean(L, M, t, opts):
     assert "Wheels up" in t and "They've seen you (the takeoff)" in t
     assert "Senaki Guns North:0=2" in opts                       # and open fire once the jet is seen
     assert M.activated["Red South"] and "Chevy 1-1, commit" in t
-    assert "OUTCOME: SUCCESS" in t and M.flags["90"] == 1 and "aboard in a Tomcat nobody launched" in t
+    assert "OUTCOME: SUCCESS" in t and M.flags["90"] == 1 and "aboard in somebody else's Tomcat" in t
 run("Away before the guards, chased, home", """
 M.advance(START + 300)
 M.event({ id = world.event.S_EVENT_TAKEOFF, initiator = JET })
