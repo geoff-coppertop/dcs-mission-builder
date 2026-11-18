@@ -11,6 +11,7 @@ F-14A Tomcat · 1 player, or 2 with a RIO · Caucasus · escape and evasion in a
 | Start | **{{ start }} local**, cold on the ramp | Seen by | about **{{ discover }}**, or {{ notice }} s after you take off |
 | Jet | Red's alert F-14A, 2× AIM-9M, 2× AIM-7M, gun, full fuel and tanks | Chasing | Two MiG-29s off Kutaisi, {{ react }} s after you're seen |
 | Home | CVN-74 · 127.5 · TACAN 74X · ICLS 11 | Help | CHEVY CAP at the coast, ARCO, MAGIC |
+| Code word | **{{ code }}**: check in with MAGIC once airborne | ID zone | {{ id_nm }} nm from Mother: unknown jets get intercepted |
 
 </div>
 
@@ -33,14 +34,14 @@ Start the Tomcat, get airborne and get home to Mother.
 - **The chase.** {{ react }} seconds after you're seen, Kutaisi's alert launches two MiG-29s at you. Kutaisi is about 25 nm east of the field, so they start close behind you.
 - **The run.** Head west, low and fast, to FEET WET on the coast. MAGIC commits CHEVY, two Hornets on CAP off the coast, onto the MiGs once they launch. The Sparrows and Sidewinders are there if the MiGs catch you first.
 - **Getting aboard.** Full fuel and two tanks. You'll be heavy for the trap: dump or burn down before you come aboard.
-- **Identification.** You're in a Red jet in Red paint. MAGIC and Mother know you're coming. Fly the route and talk to MAGIC.
+- **Identification.** HATCHET passed word over its satellite radio last night: an escape is coming, in a Red Tomcat, code word **{{ code }}**. The Navy knows that much, not when or which radar contact is you. Your jet squawks nothing the Navy recognises. Once airborne, check in with MAGIC (**F10 > Escape > Check in with MAGIC**) and you're declared friendly. If you cross into the ID zone, {{ id_nm }} nm from Mother, without checking in, MAGIC sends CHEVY to intercept you and look before anyone declares you friendly. Mother won't clear an unidentified jet inside {{ clear_nm }} nm.
 
 ## What happens next
 
 | Result | What it means |
 |---|---|
-| Success | You land aboard Mother. The pilot is home |
-| Partial | You eject over the water. The Navy picks you up, but the jet is lost |
+| Success | You land aboard Mother, identified. The pilot is home |
+| Partial | You eject over the water: the Navy picks you up, but the jet is lost. Or you trap without being identified |
 | Failure | You go down over land again |
 
 1 player, cold start. In multiplayer a second player can take the RIO seat; in single player Jester is your RIO.
@@ -61,8 +62,10 @@ Start the Tomcat, get airborne and get home to Mother.
 | ARCO | S-3B tanker | 251.0 AM, TACAN 60Y |
 | MOTHER | CVN-74 Stennis | 127.5, TACAN 74X, ICLS 11 |
 
-F10 > Escape: **Status** (seen or not, fighters, CAP), **Mission summary now**.
+F10 > Escape: **Status** (seen or not, identified or not, fighters, CAP), **Check in with MAGIC ({{ code }})** (airborne only), **Mission summary now**.
 <!-- /task -->
+
+<div class="pagebreak"></div>
 
 <div class="kicker">Map</div>
 

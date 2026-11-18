@@ -39,10 +39,14 @@ def c_clean(L, M, t, opts):
     assert "Senaki Guns North:0=2" in opts                       # and open fire once the jet is seen
     assert M.activated["Red South"] and "Chevy 1-1, commit" in t
     assert "OUTCOME: SUCCESS" in t and M.flags["90"] == 1 and "aboard in somebody else's Tomcat" in t
-run("Away before the guards, chased, home", """
+    assert "KESTREL is correct" in t and "intercept and identify" not in t and "Checked in with MAGIC" in t
+run("Away before the guards, chased, checked in, home", """
 M.advance(START + 300)
 M.event({ id = world.event.S_EVENT_TAKEOFF, initiator = JET })
+M.cmds["Escape/Check in with MAGIC (KESTREL)"]()
 M.advance(START + 300 + 20 + REACT + 10)
+JET.p = { x = -20000, y = 1500, z = -110000 }
+M.advance(START + 300 + 20 + REACT + 20)
 M.event({ id = world.event.S_EVENT_LAND, initiator = JET, place = M.carrier() })
 """, c_clean)
 
@@ -76,5 +80,43 @@ M.event({ id = world.event.S_EVENT_EJECTION, initiator = JET })
 def c_status(L, M, t, opts):
     assert "Not seen yet. Guards expected" in t
 run("Status", "M.advance(START + 60); M.cmds['Escape/Status']()", c_status)
+
+def c_intercept(L, M, t, opts):
+    assert "Unknown Tomcat, 32 nm east of Mother" in t and "intercept and identify" in t
+    task = M.tasks["Chevy"]
+    assert task and task.id == "Mission"
+    assert "Tally one Tomcat" in t and "OUTCOME: SUCCESS" in t and "Identified by CHEVY" in t
+run("No check-in: CHEVY intercepts and identifies", """
+M.event({ id = world.event.S_EVENT_TAKEOFF, initiator = JET })
+M.advance(START + 60)
+JET.p = { x = -20000, y = 1500, z = -60000 }
+M.advance(START + 75)
+local c = M.units["Chevy 1-1"]
+c.p = { x = -20500, y = 1500, z = -61000 }
+M.advance(START + 95)
+JET.p = { x = -20000, y = 1500, z = -110000 }
+M.advance(START + 100)
+M.event({ id = world.event.S_EVENT_LAND, initiator = JET, place = M.carrier() })
+""", c_intercept)
+
+
+def c_unknown_trap(L, M, t, opts):
+    assert "you are NOT cleared" in t and "trapped without clearance" in t
+    assert "OUTCOME: PARTIAL" in t and "Never identified" in t
+run("Trap without being identified", """
+M.event({ id = world.event.S_EVENT_TAKEOFF, initiator = JET })
+M.advance(START + 60)
+JET.p = { x = -20000, y = 1500, z = -112000 }
+M.advance(START + 70)
+M.event({ id = world.event.S_EVENT_LAND, initiator = JET, place = M.carrier() })
+""", c_unknown_trap)
+
+
+def c_ground_call(L, M, t, opts):
+    assert "Nobody can hear you from the ground" in t and "KESTREL is correct" not in t
+run("Check-in from the ramp does nothing", """
+M.advance(START + 30)
+M.cmds["Escape/Check in with MAGIC (KESTREL)"]()
+""", c_ground_call)
 
 print("ALL ESCAPE SCENARIOS PASSED")

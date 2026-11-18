@@ -93,6 +93,8 @@ def escape(miz, work):
     start, disc, react = cfg_num(c, "START"), cfg_num(c, "DISCOVER"), cfg_num(c, "ALERT_REACT")
     en = d["groups"]["Enfield"]
     fuel_lb = None
-    return dict(miz=Path(miz).name, start=hm(start), start_z=hms(start - ZULU), discover=hms(start + disc),
+    code = re.search(r'CODE = "([^"]+)"', c).group(1)
+    return dict(miz=Path(miz).name, code=code, id_nm=f"{cfg_num(c, 'ID_R') / NM:.0f}", clear_nm=f"{cfg_num(c, 'KEEP_CLEAR') / NM:.0f}",
+                start=hm(start), start_z=hms(start - ZULU), discover=hms(start + disc),
                 discover_min=round(disc / 60), react=int(react), notice=int(cfg_num(c, "TAKEOFF_NOTICE")),
                 route=route(d, "Enfield"), load=loadout(d, "Enfield"))

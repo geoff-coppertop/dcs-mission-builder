@@ -59,6 +59,9 @@ def draw_escape(miz):
         ax.text(p["ll"][1], p["ll"][0], str(i), ha="center", va="center", fontsize=5.6, color=BLUE, fontweight="bold", zorder=11)
         label(ax, p["ll"][1], p["ll"][0], p["name"], BLUE, dx=7, dy=-7, size=6.6)
     m_ = en[-1]["ll"]
+    id_r = cfg_num(d["cfg"], "ID_R")
+    ring(ax, m_, id_r, color=GREEN, lw=1.0, ls=(0, (4, 2)), zorder=4)
+    label(ax, *dest(m_, 52, id_r)[::-1], f"ID zone, {id_r / NM:.0f} nm from Mother:\ncheck in before you cross", GREEN, dx=-6, dy=4, ha="right", size=6.4)
     ax.plot(m_[1], m_[0], "D", ms=5.5, color=INK, zorder=9)
     label(ax, m_[1], m_[0], "MOTHER (est.)", INK, dy=-10, ha="center", va="top", size=6.4)
     scale_bar(ax, ext, 10)
