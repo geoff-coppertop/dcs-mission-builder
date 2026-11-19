@@ -17,19 +17,51 @@ T.cfg = T.cfg or {
   JET = "Enfield 1-1", OUTCOME_FLAG = "90",
   CODE = "KESTREL", CARRIER = "CVN-74 Stennis", ID_R = 83340, VID_R = 3700, VID_S = 8,
   FLEET_WARN_R = 55560, FLEET_R = 37040, MISSILE_TOF = 20,
+  PARK = { x = 0, z = 0 }, PARK_R = 30, CAUGHT_WINDOW = 60,
 }
 local C = T.cfg
 T.s = { found = nil, launched = nil, airborne = false, kills = 0, over = false,
         authed = nil, unknown = nil, identified = nil, vid = 0, warned = 0, waitSaid = nil,
-        missile = nil, fleetShot = false }
+        missile = nil, fleetShot = false, captured = nil }
 local S = T.s
+
+-- caught before wheels-up: still parked, they have you; already rolling, you get CAUGHT_WINDOW to be airborne
+function T.capture(where)
+  if S.captured or S.over then return end
+  S.captured = where
+  N.msg("HATCHET: They're all over the jet. It's over, Enfield. Hands where they can see them.", 20)
+  N.recCheck(true)
+end
+
+local function moved(u)
+  local p = u:getPoint()
+  local ok, v = pcall(u.getVelocity, u)
+  local spd = (ok and v) and math.sqrt(v.x * v.x + v.z * v.z) or 0
+  return N.dist(p, C.PARK) > C.PARK_R or spd > 2
+end
 
 function T.discover(why)
   if S.found then return end
   S.found = { t = timer.getAbsTime(), why = why }
   for _, g in ipairs(C.FIELD_AD) do N.setAD(g, true) end
-  N.msg("HATCHET: They've seen you (" .. why .. "). The field's guns are waking up. GO.", 15)
+  local u = N.liveUnit(C.JET)
+  if u and N.playerName(u) and not S.airborne then
+    if not moved(u) then
+      N.msg("HATCHET: Guards! Two of them, rifles up, at the ladder. They saw you in the cockpit (" .. why .. ").", 15)
+      T.capture("still parked")
+      return
+    end
+    N.msg("HATCHET: They've seen you (" .. why .. "). Guards running and an armoured car heading for the taxiway. " ..
+          "You have about " .. C.CAUGHT_WINDOW .. " seconds to get that thing in the air. GO.", 15)
+    timer.scheduleFunction(function()
+      if not S.airborne then T.capture("still on the taxiway") end
+      return nil
+    end, nil, timer.getTime() + C.CAUGHT_WINDOW)
+  else
+    N.msg("HATCHET: They've seen you (" .. why .. "). The field's guns are waking up. GO.", 15)
+  end
   timer.scheduleFunction(function()
+    if S.over then return nil end
     S.launched = timer.getAbsTime()
     N.activate(C.SOUTH_GROUP)
     N.msg("MAGIC: Pop-up group, " .. C.SOUTH_KIND .. " off " .. C.SOUTH_BASE .. ", hot west after the Tomcat.", 20)
@@ -195,7 +227,8 @@ function N.onAllDown()
     kind = N.rec.lossKind[p] or kind
   end
   local outcome, why
-  if S.fleetShot then outcome, why = "FAILURE", "Shot down by our own fleet, silent and unidentified. The Navy fished you out; the Captain wants a word."
+  if S.captured then outcome, why = "FAILURE", "Captured on the ramp, " .. S.captured .. ". HATCHET got away; you didn't."
+  elseif S.fleetShot then outcome, why = "FAILURE", "Shot down by our own fleet, silent and unidentified. The Navy fished you out; the Captain wants a word."
   elseif home then outcome, why = "SUCCESS", "The pilot is home, in a jet Red had to watch leave."
   elseif kind == "water" then outcome, why = "PARTIAL", "Down over the water: the Navy picks the crew up. The jet is gone."
   else outcome, why = "FAILURE", "Down over Red territory again." end

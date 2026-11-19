@@ -90,6 +90,7 @@ def build():
                                             targets=[task.Targets.All.Air]))
     w.tasks.append(task.OrbitAction(altitude=4000, speed=850, pattern=task.OrbitAction.OrbitPattern.Circle))
 
+    park = g.units[0].position
     cfg = f"""T.cfg = {{
   NAME = "OPERATION DEEP CUT: ESCAPE", START = {b.start_s}, DISCOVER = {DISCOVER}, TAKEOFF_NOTICE = 20, ALERT_REACT = {ALERT_REACT},
   FIELD = "Senaki-Kolkhi", FIELD_AD = {{ "Senaki Guns North", "Senaki Guns South", "Senaki SA-13" }},
@@ -97,6 +98,7 @@ def build():
   JET = "Enfield 1-1", OUTCOME_FLAG = "90",
   CODE = "KESTREL", CARRIER = "CVN-74 Stennis", ID_R = 83340, VID_R = 3700, VID_S = 8,
   FLEET_WARN_R = 55560, FLEET_R = 37040, MISSILE_TOF = 20,
+  PARK = {{ x = {park.x:.1f}, z = {park.y:.1f} }}, PARK_R = 30, CAUGHT_WINDOW = 60,
 }}
 """
     b.add_cap_scripts("the coast")

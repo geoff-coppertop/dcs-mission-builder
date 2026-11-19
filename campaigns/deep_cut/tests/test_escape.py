@@ -9,6 +9,7 @@ cfg = SCRIPTS[-1]
 START = float(re.search(r"START = (\d+)", cfg).group(1))
 DISCOVER = float(re.search(r"DISCOVER = (\d+)", cfg).group(1))
 REACT = float(re.search(r"ALERT_REACT = (\d+)", cfg).group(1))
+PX, PZ = (float(v) for v in re.search(r"PARK = \{ x = (-?[\d.]+), z = (-?[\d.]+) \}", cfg).groups())
 
 SETUP = """
 local M = MOCKSTATE
@@ -22,7 +23,7 @@ JET = M.player("Geoff", "Enfield 1-1", 0, 0, 270, 10)
 
 def run(name, body, check):
     L, M = make(START, SETUP, SCRIPTS)
-    L.execute(f"local M = MOCKSTATE; local START, DISCOVER, REACT = {START}, {DISCOVER}, {REACT}\n" + body)
+    L.execute(f"local M = MOCKSTATE; local START, DISCOVER, REACT, PX, PZ = {START}, {DISCOVER}, {REACT}, {PX}, {PZ}\n" + body)
     t = text(M)
     opts = [M.opts[i] for i in range(1, len(M.opts) + 1)]
     try:
@@ -51,11 +52,34 @@ M.event({ id = world.event.S_EVENT_LAND, initiator = JET, place = M.carrier() })
 """, c_clean)
 
 
-def c_slow(L, M, t, opts):
-    assert "They've seen you (a guard on his rounds)" in t
-    assert not M.activated["Red South"]
-    M.flags  # fighters are 90 s behind the discovery
-run("Too slow on the ramp", "M.advance(START + DISCOVER + 5)", c_slow)
+def c_parked(L, M, t, opts):
+    assert "Guards! Two of them, rifles up, at the ladder" in t
+    assert "OUTCOME: FAILURE" in t and "Captured on the ramp, still parked" in t and M.flags["90"] == 3
+    assert not M.activated["Red South"]                  # it's over: no chase
+run("Still parked when the guards come: captured", """
+JET.p = { x = PX, y = 10, z = PZ }
+M.advance(START + DISCOVER + REACT + 30)
+""", c_parked)
+
+
+def c_taxi_late(L, M, t, opts):
+    assert "armoured car heading for the taxiway" in t and "Captured on the ramp, still on the taxiway" in t
+    assert M.flags["90"] == 3
+run("Taxiing when the guards come, not airborne in time: captured", """
+JET.p = { x = PX + 400, y = 10, z = PZ }
+M.advance(START + DISCOVER + 65)
+""", c_taxi_late)
+
+
+def c_taxi_made_it(L, M, t, opts):
+    assert "armoured car heading for the taxiway" in t and "Wheels up" in t
+    assert "Captured" not in t and "OUTCOME" not in t and M.activated["Red South"]
+run("Taxiing when the guards come, airborne inside the window: away", """
+JET.p = { x = PX + 400, y = 10, z = PZ }
+M.advance(START + DISCOVER + 30)
+M.event({ id = world.event.S_EVENT_TAKEOFF, initiator = JET })
+M.advance(START + DISCOVER + REACT + 10)
+""", c_taxi_made_it)
 
 
 def c_water(L, M, t, opts):

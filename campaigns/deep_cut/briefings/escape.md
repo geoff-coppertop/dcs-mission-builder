@@ -26,7 +26,7 @@ F-14A Tomcat · 1 player, or 2 with a RIO · Caucasus · escape and evasion in a
 
 "Their crew aligned it during engine runs yesterday and nobody's moved it since, so use the stored heading. A full alignment and you'll still be sitting here when the guards come round. The start cart's still hooked up for them. Good thing: no APU on these.
 
-"Guards are doubled after what you lot did to the gorge. Someone checks this end at about **{{ discover }}**, so be rolling well before that. The moment you take off they'll know, and the guns on this field will open up: ZU-23s, a Shilka, an SA-13. Kutaisi's alert crews are sitting in their jets since yesterday, but the word still has to get from here to the sector and back down to them. Figure two MiG-29s off the ground five or six minutes after you're seen. Use the head start.
+"Guards are doubled after what you lot did to the gorge. Someone checks this end at about **{{ discover }}**, so be rolling well before that. If they find you still sitting here, that's it: we're done, both of us. If you're already moving, you might have a minute before they get something across the taxiway. The moment you take off they'll know, and the guns on this field will open up: ZU-23s, a Shilka, an SA-13. Kutaisi's alert crews are sitting in their jets since yesterday, but the word still has to get from here to the sector and back down to them. Figure two MiG-29s off the ground five or six minutes after you're seen. Use the head start.
 
 "Go west, low and fast, to the coast. The Navy knows someone's coming out in a Red Tomcat. It doesn't know when, or which blip is you. Once you're airborne, call MAGIC and give them **{{ code }}**, straight away. An unknown jet heading for a carrier from this side of the coast is a threat until somebody proves otherwise. Their fighters will be busy with you instead of the MiGs, and get too close and the ships will shoot. Mother's TACAN is 74X. Their radios are set up for their flight, not yours.
 
@@ -41,6 +41,7 @@ Start the Tomcat, get airborne and get home to Mother.
 ## How the game plays it
 
 - **Get moving.** The stored-heading alignment takes about 3 minutes and runs while the engines spin up; a full alignment (about 8) won't finish before the guards arrive. The jet is noticed {{ notice }} seconds after you take off, when the guards arrive, or at once if you fire the gun on the field.
+- **Caught on the ground.** If you're noticed before you take off and the jet is still in its parking spot, you're captured on the spot. If it's already moving, you get about {{ caught }} seconds to be wheels-up; otherwise you're captured.
 - **The chase.** {{ react_min }} minutes after you're seen (relaying the report, then a scramble from cockpit readiness), two MiG-29s launch from Kutaisi, about 25 nm east. Get feet wet before they're up and they have to chase you into CHEVY, two Hornets on CAP off the coast, which MAGIC commits onto them. Slow on the ramp, or a long time over land, and they catch you.
 - **Identification.** Once you're airborne, F10 > Escape > Check in with MAGIC declares you friendly. Stay silent and it costs you:
     - In the ID zone ({{ id_nm }} nm from Mother), CHEVY is committed to intercept you, **ahead of the MiGs**. It can't cover you from them until you're identified, by checking in or by CHEVY getting close enough to see you.
@@ -52,7 +53,7 @@ Start the Tomcat, get airborne and get home to Mother.
 |---|---|
 | Success | You land aboard Mother, identified. The pilot is home |
 | Partial | You eject over the water: the Navy picks you up, but the jet is lost |
-| Failure | You go down over land again, or the fleet shoots you down |
+| Failure | You're caught before you get airborne, you go down over land again, or the fleet shoots you down |
 
 1 player, cold start. In multiplayer a second player can take the RIO seat; in single player Jester is your RIO.
 <!-- /ingame -->
