@@ -15,8 +15,8 @@ T.cfg = T.cfg or {
   FIELD = "Senaki-Kolkhi", FIELD_AD = { "Senaki Guns North", "Senaki Guns South", "Senaki SA-13" },
   SOUTH_GROUP = "Red South", SOUTH_KIND = "two MiG-29s", SOUTH_BASE = "Kutaisi",
   JET = "Enfield 1-1", OUTCOME_FLAG = "90",
-  CODE = "KESTREL", CARRIER = "CVN-74 Stennis", ID_R = 83340, VID_R = 3700, VID_S = 8,
-  FLEET_WARN_R = 55560, FLEET_R = 37040, MISSILE_TOF = 20,
+  CODE = "KESTREL", CARRIER = "CVN-74 Stennis", ID_R = 148160, VID_R = 3700, VID_S = 8,
+  FLEET_WARN_R = 37040, FLEET_R = 18520, MISSILE_TOF = 20,
   PARK = { x = 0, z = 0 }, PARK_R = 30, CAUGHT_WINDOW = 60,
   GUARD_CAR = "Senaki Guard Car", GUARDS = "Senaki Guards", GUARD_TYPE = "Soldier AK",
 }

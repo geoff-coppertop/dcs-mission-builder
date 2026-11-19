@@ -20,7 +20,7 @@ from missionbuilder.paths import read_lua
 from missionbuilder.red_arms import arm
 
 START = datetime.datetime(2027, 1, 14, 10, 0, 0)     # winter, mid-morning (Caucasus local = Z+4)
-TOT_OFFSET = 40 * 60
+TOT_OFFSET = 45 * 60                                 # cold start, ~60 nm to PUSH, the run in
 
 VARIANTS = {
     "standard": dict(file="Operation_Deep_Cut.miz", title="Operation Deep Cut", tag="",
@@ -48,6 +48,7 @@ NARROWS = (42.850, 42.090)
 BEND = (42.900, 42.140)
 TGT = (42.952, 42.195)             # planned portal, near Khaishi
 PUSH = (42.320, 41.250)            # over the sea, short of the coast
+CVN_START = (42.150, 39.900)       # ~75 nm off the coast, steaming west: ~110 nm out by recovery (stand-off from coastal missiles)
 CAP = (42.300, 41.150)             # CHEVY's station, over the water off the Enguri mouth
 TANKER = (42.300, 40.950)
 NORTH_SPAWN = (43.150, 42.450)     # over the main range
@@ -72,7 +73,7 @@ def build(key):
     det_r = round(tgt.distance_to_point(pts["GATE"]) + 2000, -2)
     pop_r = 7000
 
-    b.carrier(recovery_min=65)
+    b.carrier(start=CVN_START, recovery_min=65)
     cvn = b.cvn_start
 
     # ------------------------------------------------------------ Blue

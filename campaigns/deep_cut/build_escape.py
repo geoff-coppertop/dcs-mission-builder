@@ -36,7 +36,7 @@ def build():
     fp = field.position
     coast = P(*COAST)
 
-    b.carrier(recovery_min=40)
+    b.carrier(start=(42.150, 39.750), recovery_min=40)     # ~85 nm off the coast, ~100 nm by recovery
     b.tanker(P(42.30, 40.95))
     b.awacs()
     b.cap(P(42.25, 41.25), commit_point=coast)
@@ -102,8 +102,8 @@ def build():
   FIELD = "Senaki-Kolkhi", FIELD_AD = {{ "Senaki Guns North", "Senaki Guns South", "Senaki SA-13" }},
   SOUTH_GROUP = "Red South", SOUTH_KIND = "two MiG-29s", SOUTH_BASE = "Kutaisi",
   JET = "Enfield 1-1", OUTCOME_FLAG = "90",
-  CODE = "KESTREL", CARRIER = "CVN-74 Stennis", ID_R = 83340, VID_R = 3700, VID_S = 8,
-  FLEET_WARN_R = 55560, FLEET_R = 37040, MISSILE_TOF = 20,
+  CODE = "KESTREL", CARRIER = "CVN-74 Stennis", ID_R = 148160, VID_R = 3700, VID_S = 8,
+  FLEET_WARN_R = 37040, FLEET_R = 18520, MISSILE_TOF = 20,
   PARK = {{ x = {park.x:.1f}, z = {park.y:.1f} }}, PARK_R = 30, CAUGHT_WINDOW = 60,
   GUARD_CAR = "Senaki Guard Car", GUARDS = "Senaki Guards", GUARD_TYPE = "Soldier AK",
 }}

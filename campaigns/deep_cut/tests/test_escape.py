@@ -17,7 +17,7 @@ for _, g in ipairs({ "Senaki Guns North", "Senaki Guns South", "Senaki SA-13" })
 M.mkGroup("Red South", { M.mkUnit("Red South 1", 5000, 40000), M.mkUnit("Red South 2", 5000, 40100) })
 M.mkGroup("Senaki Guard Car", { M.mkUnit("Senaki BRDM-2", 100, 100) })
 M.mkGroup("Chevy", { M.mkUnit("Chevy 1-1", -10000, -80000), M.mkUnit("Chevy 1-2", -10100, -80000) })
-M.mkGroup("CVN-74 Stennis", { M.mkUnit("CVN-74 Stennis", -20000, -120000) })
+M.mkGroup("CVN-74 Stennis", { M.mkUnit("CVN-74 Stennis", -20000, -300000) })
 JET = M.player("Geoff", "Enfield 1-1", 0, 0, 270, 10)
 """
 
@@ -48,7 +48,7 @@ M.advance(START + 300)
 M.event({ id = world.event.S_EVENT_TAKEOFF, initiator = JET })
 M.cmds["Escape/Check in with MAGIC (KESTREL)"]()
 M.advance(START + 300 + 20 + REACT + 10)
-JET.p = { x = -20000, y = 1500, z = -110000 }
+JET.p = { x = -20000, y = 1500, z = -290000 }
 M.advance(START + 300 + 20 + REACT + 20)
 M.event({ id = world.event.S_EVENT_LAND, initiator = JET, place = M.carrier() })
 """, c_clean)
@@ -113,19 +113,19 @@ def c_status(L, M, t, opts):
 run("Status", "M.advance(START + 60); M.cmds['Escape/Status']()", c_status)
 
 def c_intercept(L, M, t, opts):
-    assert "Unknown Tomcat, 32 nm east of Mother" in t and "intercept and identify" in t
+    assert "Unknown Tomcat, 65 nm east of Mother" in t and "intercept and identify" in t
     task = M.tasks["Chevy"]
     assert task and task.id == "Mission"
     assert "Tally one Tomcat" in t and "OUTCOME: SUCCESS" in t and "Identified by CHEVY" in t
 run("No check-in: CHEVY intercepts and identifies", """
 M.event({ id = world.event.S_EVENT_TAKEOFF, initiator = JET })
 M.advance(START + 30)
-JET.p = { x = -20000, y = 1500, z = -60000 }
+JET.p = { x = -20000, y = 1500, z = -180000 }
 M.advance(START + 35)
 local c = M.units["Chevy 1-1"]
-c.p = { x = -20500, y = 1500, z = -61000 }
+c.p = { x = -20500, y = 1500, z = -181000 }
 M.advance(START + 50)
-JET.p = { x = -20000, y = 1500, z = -110000 }
+JET.p = { x = -20000, y = 1500, z = -290000 }
 M.advance(START + 55)
 M.event({ id = world.event.S_EVENT_LAND, initiator = JET, place = M.carrier() })
 """, c_intercept)
@@ -138,7 +138,7 @@ def c_silent(L, M, t, opts):
 run("Silent: CHEVY stays on the unknown, the MiGs wait until you check in", """
 M.event({ id = world.event.S_EVENT_TAKEOFF, initiator = JET })
 M.advance(START + 30)
-JET.p = { x = -20000, y = 1500, z = -60000 }
+JET.p = { x = -20000, y = 1500, z = -180000 }
 M.advance(START + 20 + REACT + 10)
 M.cmds["Escape/Check in with MAGIC (KESTREL)"]()
 M.advance(START + 20 + REACT + 20)
@@ -152,9 +152,9 @@ def c_divert(L, M, t, opts):
 run("MiGs first; the unknown pulls CHEVY off them; the ID sends it back", """
 M.event({ id = world.event.S_EVENT_TAKEOFF, initiator = JET })
 M.advance(START + 20 + REACT + 10)
-JET.p = { x = -20000, y = 1500, z = -60000 }
+JET.p = { x = -20000, y = 1500, z = -180000 }
 M.advance(START + 20 + REACT + 15)
-M.units["Chevy 1-1"].p = { x = -20500, y = 1500, z = -61000 }
+M.units["Chevy 1-1"].p = { x = -20500, y = 1500, z = -181000 }
 M.advance(START + 20 + REACT + 35)
 """, c_divert)
 
@@ -167,9 +167,9 @@ run("Silent inside 20 nm: the fleet shoots", """
 M.waterFn = function() return true end
 M.event({ id = world.event.S_EVENT_TAKEOFF, initiator = JET })
 M.advance(START + 30)
-JET.p = { x = -20000, y = 1500, z = -70000 }
+JET.p = { x = -20000, y = 1500, z = -270000 }
 M.advance(START + 40)
-JET.p = { x = -20000, y = 1500, z = -90000 }
+JET.p = { x = -20000, y = 1500, z = -285000 }
 M.advance(START + 70)
 M.event({ id = world.event.S_EVENT_EJECTION, initiator = JET })
 """, c_fleet)
@@ -181,7 +181,7 @@ def c_abort(L, M, t, opts):
 run("Checking in with missiles in the air aborts them", """
 M.event({ id = world.event.S_EVENT_TAKEOFF, initiator = JET })
 M.advance(START + 30)
-JET.p = { x = -20000, y = 1500, z = -90000 }
+JET.p = { x = -20000, y = 1500, z = -285000 }
 M.advance(START + 40)
 M.cmds["Escape/Check in with MAGIC (KESTREL)"]()
 M.advance(START + 70)

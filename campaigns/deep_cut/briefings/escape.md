@@ -22,6 +22,8 @@ F-14A Tomcat · 1 player, or 2 with a RIO · Caucasus · escape and evasion in a
 
 *HATCHET, low, crouched by the nose gear, {{ start }}:*
 
+"Last night was the easy part. A truck we had stashed below the dam, you under a tarp in the back, a hundred kilometres of valley road and two checkpoints down to the plain. This is the hard part.
+
 "That's your ride. It's theirs: one of the second-hand Tomcats they bought from an export customer. They can barely keep them flying, and this one's being ferried to a depot for overhaul this morning. So it's fuelled for the trip, two bags on, and the only weapon on it is the gun. Don't go looking for a fight.
 
 "Their crew aligned it during engine runs yesterday and nobody's moved it since, so use the stored heading. A full alignment and you'll still be sitting here when the guards come round. The start cart's still hooked up for them. Good thing: no APU on these.
@@ -40,6 +42,7 @@ Start the Tomcat, get airborne and get home to Mother.
 
 ## How the game plays it
 
+- **The engines.** This is an F-14A with TF30s, not the F110s you remember from the D. Handle the throttles roughly, or pull to high angle of attack at low speed, and they stall. Move the throttles smoothly, especially in burner, and give the jet a moment before you ask for everything.
 - **Get moving.** The stored-heading alignment takes about 3 minutes and runs while the engines spin up; a full alignment (about 8) won't finish before the guards arrive. The jet is noticed {{ notice }} seconds after you take off, when the guards arrive, or at once if you fire the gun on the field.
 - **Caught on the ground.** If you're noticed before you take off, guards turn out on foot and a BRDM-2 armoured car drives from the guard post straight at the jet. If the jet is still in its parking spot, you're captured on the spot. If it's already moving, you get about {{ caught }} seconds to be wheels-up; otherwise you're captured. The BRDM-2 is a real vehicle: don't taxi into it.
 - **The chase.** {{ react_min }} minutes after you're seen (relaying the report, then a scramble from cockpit readiness), two MiG-29s launch from Kutaisi, about 25 nm east. Get feet wet before they're up and they have to chase you into CHEVY, two Hornets on CAP off the coast, which MAGIC commits onto them. Slow on the ramp, or a long time over land, and they catch you.
