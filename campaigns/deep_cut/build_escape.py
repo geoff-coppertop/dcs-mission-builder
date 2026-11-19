@@ -13,7 +13,7 @@ from dcs import task, mapping
 from dcs.planes import F_14A_135_GR as F14A, MiG_29S
 from dcs.point import MovingPoint, PointAction, PointProperties
 from dcs.unit import Skill
-from dcs.vehicles import AirDefence
+from dcs.vehicles import AirDefence, Armor
 
 from missionbuilder.builder import Builder, FT, KTS
 from missionbuilder.paths import read_lua
@@ -76,6 +76,13 @@ def build():
                                           ("Senaki ZSU-23-4", AirDefence.ZSU_23_4_Shilka, fp.point_from_heading(200, 900))], 0)
     b.vgroup(b.rus, "Senaki SA-13", [("Senaki SA-13", AirDefence.Strela_10M3, fp.point_from_heading(90, 1500))], 270)
 
+    # the guard post: a BRDM-2 300 m from the Tomcat toward the field, late-activated; the script sends it at the
+    # jet (and spawns infantry) if the guards spot you before you're airborne
+    park = g.units[0].position
+    post = park.point_from_heading(park.heading_between_point(fp), 300)
+    car = b.vgroup(b.rus, "Senaki Guard Car", [("Senaki BRDM-2", Armor.BRDM_2, post)], 0)
+    car.late_activation = True
+
     # the Kutaisi alert: launches after the jet is seen
     kut = b.terrain.airports["Kutaisi"].position
     r = b.m.flight_group_inflight(b.rus, "Red South", MiG_29S, kut.point_from_heading(300, 6000), altitude=1500,
@@ -90,7 +97,6 @@ def build():
                                             targets=[task.Targets.All.Air]))
     w.tasks.append(task.OrbitAction(altitude=4000, speed=850, pattern=task.OrbitAction.OrbitPattern.Circle))
 
-    park = g.units[0].position
     cfg = f"""T.cfg = {{
   NAME = "OPERATION DEEP CUT: ESCAPE", START = {b.start_s}, DISCOVER = {DISCOVER}, TAKEOFF_NOTICE = 20, ALERT_REACT = {ALERT_REACT},
   FIELD = "Senaki-Kolkhi", FIELD_AD = {{ "Senaki Guns North", "Senaki Guns South", "Senaki SA-13" }},
@@ -99,6 +105,7 @@ def build():
   CODE = "KESTREL", CARRIER = "CVN-74 Stennis", ID_R = 83340, VID_R = 3700, VID_S = 8,
   FLEET_WARN_R = 55560, FLEET_R = 37040, MISSILE_TOF = 20,
   PARK = {{ x = {park.x:.1f}, z = {park.y:.1f} }}, PARK_R = 30, CAUGHT_WINDOW = 60,
+  GUARD_CAR = "Senaki Guard Car", GUARDS = "Senaki Guards", GUARD_TYPE = "Soldier AK",
 }}
 """
     b.add_cap_scripts("the coast")

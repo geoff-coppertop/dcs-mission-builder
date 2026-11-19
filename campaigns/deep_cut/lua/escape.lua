@@ -18,6 +18,7 @@ T.cfg = T.cfg or {
   CODE = "KESTREL", CARRIER = "CVN-74 Stennis", ID_R = 83340, VID_R = 3700, VID_S = 8,
   FLEET_WARN_R = 55560, FLEET_R = 37040, MISSILE_TOF = 20,
   PARK = { x = 0, z = 0 }, PARK_R = 30, CAUGHT_WINDOW = 60,
+  GUARD_CAR = "Senaki Guard Car", GUARDS = "Senaki Guards", GUARD_TYPE = "Soldier AK",
 }
 local C = T.cfg
 T.s = { found = nil, launched = nil, airborne = false, kills = 0, over = false,
@@ -31,6 +32,28 @@ function T.capture(where)
   S.captured = where
   N.msg("HATCHET: They're all over the jet. It's over, Enfield. Hands where they can see them.", 20)
   N.recCheck(true)
+end
+
+-- the guards turn out: infantry where they found you (at the jet, or the empty parking spot if you're rolling),
+-- and the BRDM-2 from the guard post driving at the jet, re-aimed every 5 s until you're airborne or it's over
+function T.guardsOut(at)
+  local units = {}
+  for i, off in ipairs({ { 15, 12 }, { -12, 16 }, { 18, -14 }, { -16, -10 } }) do
+    units[i] = { name = C.GUARDS .. " " .. i, type = C.GUARD_TYPE, x = at.x + off[1], y = at.z + off[2],
+                 heading = 0, skill = "Average", playerCanDrive = false }
+  end
+  pcall(coalition.addGroup, country.id.RUSSIA, Group.Category.GROUND,
+        { name = C.GUARDS, task = "Ground Nothing", units = units, route = { points = {} } })
+  N.activate(C.GUARD_CAR)
+  timer.scheduleFunction(function(_, t)
+    if S.airborne or S.over then return nil end
+    local u, g = N.liveUnit(C.JET), Group.getByName(C.GUARD_CAR)
+    if not u or not g then return nil end
+    local p = u:getPoint()
+    pcall(function() g:getController():setTask({ id = "Mission", params = { route = { points = {
+      { x = p.x, y = p.z, type = "Turning Point", action = "Off Road", speed = 25, ETA = 0, ETA_locked = false } } } } }) end)
+    return t + 5
+  end, nil, timer.getTime() + 1)
 end
 
 local function moved(u)
@@ -47,10 +70,12 @@ function T.discover(why)
   local u = N.liveUnit(C.JET)
   if u and N.playerName(u) and not S.airborne then
     if not moved(u) then
-      N.msg("HATCHET: Guards! Two of them, rifles up, at the ladder. They saw you in the cockpit (" .. why .. ").", 15)
+      T.guardsOut(u:getPoint())
+      N.msg("HATCHET: Guards! Rifles up, at the ladder, and the armoured car's coming. They saw you in the cockpit (" .. why .. ").", 15)
       T.capture("still parked")
       return
     end
+    T.guardsOut(C.PARK)
     N.msg("HATCHET: They've seen you (" .. why .. "). Guards running and an armoured car heading for the taxiway. " ..
           "You have about " .. C.CAUGHT_WINDOW .. " seconds to get that thing in the air. GO.", 15)
     timer.scheduleFunction(function()

@@ -15,6 +15,7 @@ SETUP = """
 local M = MOCKSTATE
 for _, g in ipairs({ "Senaki Guns North", "Senaki Guns South", "Senaki SA-13" }) do M.mkGroup(g, { M.mkUnit(g .. " 1", 0, 0) }) end
 M.mkGroup("Red South", { M.mkUnit("Red South 1", 5000, 40000), M.mkUnit("Red South 2", 5000, 40100) })
+M.mkGroup("Senaki Guard Car", { M.mkUnit("Senaki BRDM-2", 100, 100) })
 M.mkGroup("Chevy", { M.mkUnit("Chevy 1-1", -10000, -80000), M.mkUnit("Chevy 1-2", -10100, -80000) })
 M.mkGroup("CVN-74 Stennis", { M.mkUnit("CVN-74 Stennis", -20000, -120000) })
 JET = M.player("Geoff", "Enfield 1-1", 0, 0, 270, 10)
@@ -37,6 +38,7 @@ def run(name, body, check):
 def c_clean(L, M, t, opts):
     assert "Senaki Guns North:0=4" in opts                       # guards start on weapon hold
     assert "Wheels up" in t and "They've seen you (the takeoff)" in t
+    assert not M.activated["Senaki Guard Car"]                       # airborne before anyone came
     assert "Senaki Guns North:0=2" in opts                       # and open fire once the jet is seen
     assert M.activated["Red South"] and "Chevy 1-1, commit" in t
     assert "OUTCOME: SUCCESS" in t and M.flags["90"] == 1 and "aboard in somebody else's Tomcat" in t
@@ -53,7 +55,8 @@ M.event({ id = world.event.S_EVENT_LAND, initiator = JET, place = M.carrier() })
 
 
 def c_parked(L, M, t, opts):
-    assert "Guards! Two of them, rifles up, at the ladder" in t
+    assert "Guards! Rifles up, at the ladder" in t
+    assert M.activated["Senaki Guard Car"] and M.units["Senaki Guards 1"] is not None
     assert "OUTCOME: FAILURE" in t and "Captured on the ramp, still parked" in t and M.flags["90"] == 3
     assert not M.activated["Red South"]                  # it's over: no chase
 run("Still parked when the guards come: captured", """
@@ -64,6 +67,9 @@ M.advance(START + DISCOVER + REACT + 30)
 
 def c_taxi_late(L, M, t, opts):
     assert "armoured car heading for the taxiway" in t and "Captured on the ramp, still on the taxiway" in t
+    assert M.activated["Senaki Guard Car"] and M.tasks["Senaki Guard Car"].id == "Mission"
+    g = M.units["Senaki Guards 1"]
+    assert abs(g.p.x - (PX + 15)) < 1 and abs(g.p.z - (PZ + 12)) < 1        # at the empty parking spot
     assert M.flags["90"] == 3
 run("Taxiing when the guards come, not airborne in time: captured", """
 JET.p = { x = PX + 400, y = 10, z = PZ }
@@ -74,6 +80,7 @@ M.advance(START + DISCOVER + 65)
 def c_taxi_made_it(L, M, t, opts):
     assert "armoured car heading for the taxiway" in t and "Wheels up" in t
     assert "Captured" not in t and "OUTCOME" not in t and M.activated["Red South"]
+    assert M.activated["Senaki Guard Car"]
 run("Taxiing when the guards come, airborne inside the window: away", """
 JET.p = { x = PX + 400, y = 10, z = PZ }
 M.advance(START + DISCOVER + 30)

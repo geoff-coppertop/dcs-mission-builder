@@ -45,6 +45,8 @@ def draw_escape(miz):
     for gn in ("Senaki Guns North", "Senaki Guns South", "Senaki SA-13"):
         for u in g[gn]["units"]:
             ax.plot(u["ll"][1], u["ll"][0], "D", ms=3.5, color=ORANGE, zorder=9)
+    for u in g["Senaki Guard Car"]["units"]:
+        ax.plot(u["ll"][1], u["ll"][0], "s", ms=3.5, color=RED, zorder=9)
     r = g["Red South"]["route"]
     ax.plot(r[0]["ll"][1], r[0]["ll"][0], "^", ms=6, color=RED, zorder=8)
     arrow(ax, r[0]["ll"], r[1]["ll"], RED, lw=0.9, ls=(0, (3, 2)))
