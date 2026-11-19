@@ -51,7 +51,7 @@ Start the Tomcat, get airborne and get home to Mother.
 | Result | What it means |
 |---|---|
 | Success | You land aboard Mother, identified. The pilot is home |
-| Partial | You eject over the water: the Navy picks you up, but the jet is lost. Or you trap without being identified |
+| Partial | You eject over the water: the Navy picks you up, but the jet is lost |
 | Failure | You go down over land again, or the fleet shoots you down |
 
 1 player, cold start. In multiplayer a second player can take the RIO seat; in single player Jester is your RIO.

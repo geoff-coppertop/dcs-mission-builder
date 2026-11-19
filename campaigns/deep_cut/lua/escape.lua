@@ -20,7 +20,7 @@ T.cfg = T.cfg or {
 }
 local C = T.cfg
 T.s = { found = nil, launched = nil, airborne = false, kills = 0, over = false,
-        authed = nil, unknown = nil, identified = nil, vid = 0, warned = 0, trapUnknown = false, waitSaid = nil,
+        authed = nil, unknown = nil, identified = nil, vid = 0, warned = 0, waitSaid = nil,
         missile = nil, fleetShot = false }
 local S = T.s
 
@@ -184,13 +184,7 @@ N.on(function(e)
   end
 end)
 
-function N.onTrap(pname)
-  if known() then N.msg("MOTHER: " .. pname .. " aboard in somebody else's Tomcat. Welcome home.", 20)
-  else
-    S.trapUnknown = true
-    N.msg("MOTHER: An unidentified Tomcat just trapped without clearance. Marines to the flight deck.", 20)
-  end
-end
+function N.onTrap(pname) N.msg("MOTHER: " .. pname .. " aboard in somebody else's Tomcat. Welcome home.", 20) end
 
 function N.onAllDown()
   if S.over then return end
@@ -202,8 +196,7 @@ function N.onAllDown()
   end
   local outcome, why
   if S.fleetShot then outcome, why = "FAILURE", "Shot down by our own fleet, silent and unidentified. The Navy fished you out; the Captain wants a word."
-  elseif home and not S.trapUnknown then outcome, why = "SUCCESS", "The pilot is home, in a jet Red had to watch leave."
-  elseif home then outcome, why = "PARTIAL", "Home, but unannounced: an unidentified jet on the deck. Expect a long talk with the Captain."
+  elseif home then outcome, why = "SUCCESS", "The pilot is home, in a jet Red had to watch leave."
   elseif kind == "water" then outcome, why = "PARTIAL", "Down over the water: the Navy picks the crew up. The jet is gone."
   else outcome, why = "FAILURE", "Down over Red territory again." end
   trigger.action.setUserFlag(C.OUTCOME_FLAG, ({ SUCCESS = 1, PARTIAL = 2, FAILURE = 3 })[outcome])
