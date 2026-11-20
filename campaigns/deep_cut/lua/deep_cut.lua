@@ -490,6 +490,11 @@ function T.init()
 
   -- MAGIC calls the push: leave PUSH now at the planned speeds and the TGT waypoint comes up at TOT
   if C.PUSH_T then
+    at(C.PUSH_T - 300, function()
+      N.msg(string.format("MAGIC: Enfield, Springfield, five minutes to push. Hold at PUSH, left-hand, inbound on the " ..
+            "course to FEET DRY: Enfield %d, Springfield %d. Push %sL.", C.HOLD_EN_FT or 3000, C.HOLD_SP_FT or 4000,
+            N.hms(C.PUSH_T)), 15)
+    end)
     at(C.PUSH_T - 60, function()
       N.msg("MAGIC: Enfield, one minute to push. Push " .. N.hms(C.PUSH_T) .. "L, TOT " .. N.hms(C.TOT) .. "L.", 12)
     end)

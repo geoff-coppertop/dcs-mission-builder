@@ -165,6 +165,7 @@ M.advance(TOT - 600 + GRACE + 3)
 """, c_dam)
 
     def c_push(L, M, t):
+        assert "five minutes to push. Hold at PUSH" in t and "Enfield 3000, Springfield 4000" in t
         assert "Enfield, one minute to push" in t and "Enfield, PUSH PUSH" in t and "Springfield, PUSH PUSH" in t
     run("MAGIC calls the push", "M.advance(PUSH_T + SPRING_DELAY + 2)", c_push)
 

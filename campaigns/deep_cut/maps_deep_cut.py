@@ -132,6 +132,20 @@ def draw(miz):
         ax.plot(lo, la, "o", ms=8, color="white", mec=BLUE, mew=1.5, zorder=10)
         ax.text(lo, la, str(i), ha="center", va="center", fontsize=5.6, color=BLUE, fontweight="bold", zorder=11)
         label(ax, lo, la, p["name"], BLUE, dx=7, dy=-7, size=6.6, weight="bold" if p["name"] == "TGT" else "normal")
+    # the hold at PUSH: left-hand racetrack, inbound leg ending at PUSH on the course to the next waypoint
+    pi = [p["name"] for p in en].index("PUSH")
+    push_ll, crs = en[pi]["ll"], bearing_dist(en[pi]["ll"], en[pi + 1]["ll"])[0]
+    leg_m, w_m = cfg_num(c, "HOLD_LEG_NM") * NM, 3.0 * NM
+    a0 = dest(push_ll, crs + 180, leg_m)                      # start of the inbound leg
+    r = w_m / 2                                               # turns are semicircles, centres left of course
+    c1_, c2_ = dest(push_ll, crs - 90, r), dest(a0, crs - 90, r)
+    turn1 = [dest(c1_, crs + 90 - a, r) for a in range(0, 181, 15)]   # PUSH round to the outbound leg
+    turn2 = [dest(c2_, crs - 90 - a, r) for a in range(0, 181, 15)]   # outbound end round to the inbound leg
+    loop = [a0, push_ll] + turn1 + turn2
+    ax.plot([p[1] for p in loop], [p[0] for p in loop], color=BLUE, lw=1.6, ls=(0, (3, 2)), zorder=6)
+    c1 = dest(a0, crs - 90, w_m)
+    mid = dest(c1, crs, leg_m / 2)
+    label(ax, mid[1], mid[0], "HOLD  left, inbound %03.0f°" % crs, BLUE, dy=8, ha="center", size=6.5)
     c0 = en[0]["ll"]
     ax.plot(c0[1], c0[0], "D", ms=5.5, color=INK, zorder=9)
     cv_name = re.search(r'CARRIER = "([^"]+)"', c).group(1).split(" ")[0]

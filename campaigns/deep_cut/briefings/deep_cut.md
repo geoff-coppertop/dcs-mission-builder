@@ -46,7 +46,9 @@ At **{{ hammer }}**, {{ hammer_lead }} minutes before TOT, HAMMER, a salvo of To
 
 ## Getting there on time
 
-MAGIC calls the push. You'll hear "one minute to push", then **PUSH PUSH** at **{{ push }}** for Enfield and at {{ spring_push }} for Springfield. Leave PUSH (waypoint {{ push_wp }}) on the call and fly the planned speeds on the route card; it gives the planned time at every waypoint to the target.
+**Hold at PUSH** (waypoint {{ push_wp }}), over the water short of the coast: a left-hand racetrack with {{ hold_leg }} nm legs, the inbound leg on **{{ hold_course }}°** ending at PUSH. That's the course to FEET DRY, so the push is straight ahead. **Enfield {{ hold_en }} ft, Springfield {{ hold_sp }} ft.** Be established by {{ hold_by }}, and time your last lap to cross PUSH inbound on the call.
+
+MAGIC calls the push. You'll hear "five minutes to push" with the hold, then "one minute to push", then **PUSH PUSH** at **{{ push }}** for Enfield and at {{ spring_push }} for Springfield. Leave PUSH (waypoint {{ push_wp }}) on the call and fly the planned speeds on the route card; it gives the planned time at every waypoint to the target.
 
 To let the jet do the sums, set the Hornet's TOT function: on the HSI DATA page, on the waypoint sequence (SEQUFC) page, enter TOT **{{ tot_z }}** Zulu (local time minus 4 hours on this map; Springfield {{ spring_tot_z }}) and set TGT to **waypoint {{ tgt_wp }}**. Leave the ground speed entry blank. The HSI then shows the ground speed you need to make the TOT. Fly that, and step through the waypoints in order: set the HSI to auto-sequence, or step it by hand at each one. radio menu > F10. Other > Deep Cut > Time check gives the push time, the TOT and how long is left.
 
@@ -105,6 +107,7 @@ Every slot is a client slot: in single player pick one (Enfield 1-1 is the lead)
 | Event | Local |
 |---|---|
 | Mission start, cold on the deck | {{ start }} |
+| Established in the hold at PUSH (Enfield {{ hold_en }} ft, Springfield {{ hold_sp }} ft) | {{ hold_by }} |
 | **Push: Enfield** (Springfield {{ spring_push }}) | **{{ push }}** |
 | HAMMER: TLAMs hit Red's air defence command post and fighter control | {{ hammer }} |
 | Window opens | {{ win_on }} |

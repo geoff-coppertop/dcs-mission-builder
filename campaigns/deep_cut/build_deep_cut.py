@@ -61,6 +61,8 @@ def lua_pt(p):
 
 SC_SHIP = CVN_71                    # the Supercarrier versions: CVN-71 Theodore Roosevelt (players need the module)
 SPRING_DELAY = 45                   # Springfield's TGT time after Enfield's
+HOLD_EN_FT, HOLD_SP_FT = 3000, 4000  # the hold at PUSH: left racetrack, inbound on the course to FEET DRY
+HOLD_LEG_NM = 5
 
 
 def sc_file(f, sc):
@@ -90,9 +92,9 @@ def build(key, sc=False):
     strike = {1: W["9X_1"], 2: W["HARM_2"], 3: W["GBU12_3"], 4: W["LITENING"], 5: W["TANK_5"],
               6: W["120_6"], 7: W["GBU12_7"], 8: W["HARM_8"], 9: W["9X_9"]}
 
-    def strike_route():
+    def strike_route(hold_ft=3000):
         return [("DEPART", cvn.point_from_heading(45, 18_000), 5000, 350),
-                ("PUSH", pts["PUSH"], 3000, 420),
+                ("PUSH", pts["PUSH"], hold_ft, 420),
                 ("FEET DRY", pts["FEET_DRY"], 500, 480, "RADIO"),
                 ("RIVER", pts["RIVER"], 500, 480, "RADIO"),
                 ("GATE", pts["GATE"], 300, 480, "RADIO"),
@@ -111,7 +113,7 @@ def build(key, sc=False):
              eta={"TGT": TOT_OFFSET})
     # Enfield 1-2 trails 30 s to stay out of its lead's fragments; Springfield attacks 45 s after TOT off a
     # different heading (see the briefing), inside the kill window in both variants
-    b.flight("Springfield", HN, [strike, strike], strike_route(), 2, [Skill.Client, Skill.Client],
+    b.flight("Springfield", HN, [strike, strike], strike_route(HOLD_SP_FT), 2, [Skill.Client, Skill.Client],
              eta={"TGT": TOT_OFFSET + SPRING_DELAY})
     # PUSH time: TOT less the planned time from PUSH to TGT at each leg's planned speed; MAGIC calls it
     legs = strike_route()
@@ -184,6 +186,7 @@ def build(key, sc=False):
   JETS = {{ "Enfield 1-1", "Enfield 1-2", "Springfield 1-1", "Springfield 1-2" }},
   NEXT_ESCAPE = "{sc_file('Operation_Deep_Cut_Escape.miz', sc)}", RESCUE_FLAG = "91",
   CARRIER = "{b.cvn_name}", PUSH_T = {push_t}, SPRING_DELAY = {SPRING_DELAY},
+  HOLD_EN_FT = {HOLD_EN_FT}, HOLD_SP_FT = {HOLD_SP_FT}, HOLD_LEG_NM = {HOLD_LEG_NM},
   PTS_BREACH = 15, PTS_KILL = 25, PTS_ONTIME = 12, PTS_UNSEEN = 8, PTS_SURVIVAL = 40,
   OUTCOME_FLAG = "90", SCORE_FLAG = "92",
 }}
