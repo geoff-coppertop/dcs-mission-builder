@@ -1,4 +1,4 @@
-"""Build Operation_Deep_Cut.miz and Operation_Deep_Cut_Hard.miz (Caucasus; F/A-18C strike; 1-4 players).
+"""Build Operation_Deep_Cut.miz and Operation_Deep_Cut_Hard.miz (Caucasus; F/A-18C strike; 1-2 players).
 
 python3 build_deep_cut.py            -> both variants
 python3 build_deep_cut.py hard       -> one
@@ -60,8 +60,7 @@ def lua_pt(p):
 
 
 SC_SHIP = CVN_71                    # the Supercarrier versions: CVN-71 Theodore Roosevelt (players need the module)
-SPRING_DELAY = 45                   # Springfield's TGT time after Enfield's
-HOLD_EN_FT, HOLD_SP_FT = 3000, 4000  # the hold at PUSH: left racetrack, inbound on the course to FEET DRY
+HOLD_FT = 3000                      # the hold at PUSH: left racetrack, inbound on the course to FEET DRY
 HOLD_LEG_NM = 5
 
 
@@ -92,7 +91,7 @@ def build(key, sc=False):
     strike = {1: W["9X_1"], 2: W["HARM_2"], 3: W["GBU12_3"], 4: W["LITENING"], 5: W["TANK_5"],
               6: W["120_6"], 7: W["GBU12_7"], 8: W["HARM_8"], 9: W["9X_9"]}
 
-    def strike_route(hold_ft=3000):
+    def strike_route(hold_ft=HOLD_FT):
         return [("DEPART", cvn.point_from_heading(45, 18_000), 5000, 350),
                 ("PUSH", pts["PUSH"], hold_ft, 420),
                 ("FEET DRY", pts["FEET_DRY"], 500, 480, "RADIO"),
@@ -111,10 +110,7 @@ def build(key, sc=False):
     # selectable in single player too
     b.flight("Enfield", HN, [strike, strike], strike_route(), 1, [Skill.Client, Skill.Client],
              eta={"TGT": TOT_OFFSET})
-    # Enfield 1-2 trails 30 s to stay out of its lead's fragments; Springfield attacks 45 s after TOT off a
-    # different heading (see the briefing), inside the kill window in both variants
-    b.flight("Springfield", HN, [strike, strike], strike_route(HOLD_SP_FT), 2, [Skill.Client, Skill.Client],
-             eta={"TGT": TOT_OFFSET + SPRING_DELAY})
+    # one two-ship: Enfield 1-2 trails its lead by 30 s on the same line to stay out of the fragments
     # PUSH time: TOT less the planned time from PUSH to TGT at each leg's planned speed; MAGIC calls it
     legs = strike_route()
     i0, i1 = [l[0] for l in legs].index("PUSH"), [l[0] for l in legs].index("TGT")
@@ -183,10 +179,10 @@ def build(key, sc=False):
   SOUTH_GROUP = "Red South", NORTH_GROUP = "Red North", SOUTH_KIND = "{v['south'][2]}", NORTH_KIND = "{v['north'][2]}",
   SOUTH_BASE = "Kutaisi", ALERT_REACT = 90,
   TEAM = "Hatchet", TEAM_R_MIN = 1200, TEAM_R_MAX = 3000, LASER_CODE = 1688,
-  JETS = {{ "Enfield 1-1", "Enfield 1-2", "Springfield 1-1", "Springfield 1-2" }},
+  JETS = {{ "Enfield 1-1", "Enfield 1-2" }},
   NEXT_ESCAPE = "{sc_file('Operation_Deep_Cut_Escape.miz', sc)}", RESCUE_FLAG = "91",
-  CARRIER = "{b.cvn_name}", PUSH_T = {push_t}, SPRING_DELAY = {SPRING_DELAY},
-  HOLD_EN_FT = {HOLD_EN_FT}, HOLD_SP_FT = {HOLD_SP_FT}, HOLD_LEG_NM = {HOLD_LEG_NM},
+  CARRIER = "{b.cvn_name}", PUSH_T = {push_t},
+  HOLD_FT = {HOLD_FT}, HOLD_LEG_NM = {HOLD_LEG_NM},
   PTS_BREACH = 15, PTS_KILL = 25, PTS_ONTIME = 12, PTS_UNSEEN = 8, PTS_SURVIVAL = 40,
   OUTCOME_FLAG = "90", SCORE_FLAG = "92",
 }}

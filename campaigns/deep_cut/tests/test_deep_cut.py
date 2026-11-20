@@ -14,7 +14,7 @@ def suite(path):
     SCRIPTS = scripts_from_miz(path)
     cfg = SCRIPTS[-1]
     V = {k: num(cfg, k) for k in ("START", "TOT", "WINDOW", "HAMMER", "REPAIR", "SAM_UP", "REACT", "KILL_WINDOW",
-                                  "FLOOR_FT", "GRACE", "DET_R", "POP_R", "ALERT_REACT", "PUSH_T", "SPRING_DELAY")}
+                                  "FLOOR_FT", "GRACE", "DET_R", "POP_R", "ALERT_REACT", "PUSH_T")}
     CARRIER = re.search(r'CARRIER = "([^"]+)"', cfg).group(1)
     TX, TZ = (float(v) for v in re.search(r"TGT = \{ x = (-?[\d.]+), z = (-?[\d.]+)", cfg).groups())
     hard = "(HARD)" in cfg
@@ -165,9 +165,9 @@ M.advance(TOT - 600 + GRACE + 3)
 """, c_dam)
 
     def c_push(L, M, t):
-        assert "five minutes to push. Hold at PUSH" in t and "Enfield 3000, Springfield 4000" in t
-        assert "Enfield, one minute to push" in t and "Enfield, PUSH PUSH" in t and "Springfield, PUSH PUSH" in t
-    run("MAGIC calls the push", "M.advance(PUSH_T + SPRING_DELAY + 2)", c_push)
+        assert "five minutes to push. Hold at PUSH" in t and "FEET DRY, 3000" in t
+        assert "Enfield, one minute to push" in t and "Enfield, PUSH PUSH" in t and "Springfield" not in t
+    run("MAGIC calls the push", "M.advance(PUSH_T + 60)", c_push)
 
     if not hard:
         def c_warn(L, M, t):

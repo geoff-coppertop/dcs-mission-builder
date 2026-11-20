@@ -25,7 +25,7 @@ T.cfg = T.cfg or {
   SOUTH_GROUP = "Red South", NORTH_GROUP = "Red North", SOUTH_KIND = "two MiG-29s", NORTH_KIND = "two MiG-21s",
   SOUTH_BASE = "Kutaisi", ALERT_REACT = 90,
   TEAM = "Hatchet", TEAM_R_MIN = 1200, TEAM_R_MAX = 3000, LASER_CODE = 1688,
-  JETS = { "Enfield 1-1", "Enfield 1-2", "Springfield 1-1", "Springfield 1-2" },
+  JETS = { "Enfield 1-1", "Enfield 1-2" },
   NEXT_ESCAPE = "Operation_Deep_Cut_Escape.miz", RESCUE_FLAG = "91",
   PTS_BREACH = 15, PTS_KILL = 25, PTS_ONTIME = 12, PTS_UNSEEN = 8, PTS_SURVIVAL = 40,
   OUTCOME_FLAG = "90", SCORE_FLAG = "92",
@@ -491,17 +491,16 @@ function T.init()
   -- MAGIC calls the push: leave PUSH now at the planned speeds and the TGT waypoint comes up at TOT
   if C.PUSH_T then
     at(C.PUSH_T - 300, function()
-      N.msg(string.format("MAGIC: Enfield, Springfield, five minutes to push. Hold at PUSH, left-hand, inbound on the " ..
-            "course to FEET DRY: Enfield %d, Springfield %d. Push %sL.", C.HOLD_EN_FT or 3000, C.HOLD_SP_FT or 4000,
+      N.msg(string.format("MAGIC: Enfield, five minutes to push. Hold at PUSH, left-hand, inbound on the " ..
+            "course to FEET DRY, %d. Push %sL.", C.HOLD_FT or 3000,
             N.hms(C.PUSH_T)), 15)
     end)
     at(C.PUSH_T - 60, function()
       N.msg("MAGIC: Enfield, one minute to push. Push " .. N.hms(C.PUSH_T) .. "L, TOT " .. N.hms(C.TOT) .. "L.", 12)
     end)
     at(C.PUSH_T, function()
-      N.msg("MAGIC: Enfield, PUSH PUSH. TOT " .. N.hms(C.TOT) .. "L. Springfield, push in " .. C.SPRING_DELAY .. ".", 15)
+      N.msg("MAGIC: Enfield, PUSH PUSH. TOT " .. N.hms(C.TOT) .. "L.", 15)
     end)
-    at(C.PUSH_T + C.SPRING_DELAY, function() N.msg("MAGIC: Springfield, PUSH PUSH.", 12) end)
   end
 
   at(C.HAMMER, function()

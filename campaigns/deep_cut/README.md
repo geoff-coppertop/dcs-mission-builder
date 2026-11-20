@@ -1,6 +1,6 @@
 # Operation Deep Cut
 
-A low-level strike on the Caucasus map for up to four players, two pairs of F/A-18C strike Hornets cold on the
+A low-level strike on the Caucasus map for one or two players, a pair of F/A-18C strike Hornets cold on the
 deck of the John C. Stennis, with a follow-up if a pilot goes down over land. One Hornet can fly it alone: HATCHET,
 a special forces team on the ridge, lases the target on call so a solo pilot only has to fly and drop.
 
@@ -39,7 +39,7 @@ warns at 20 nm and the fleet shoots inside 10 nm unless you authenticate before 
   reservoir (`land.getSurfaceHeightWithSeabed`), so the dam's crest and the lake count, not the gorge 270 m below the
   dam or the reservoir's bed.
 - **Push.** The builder works out the push time from the planned leg speeds between PUSH and TGT; MAGIC calls it
-  (Enfield, then Springfield 45 s later) and the briefing gives the Hornet TOT setup and a time at every waypoint.
+  and the briefing gives the Hornet TOT setup and a time at every waypoint.
 - **Timing.** HAMMER, a scripted TLAM strike, destroys the sector air defence command post and Kutaisi's
   fighter-control radar three minutes before TOT; Kutaisi's alert waits for the backup (10 minutes, 7 hard). Bombs
   before HAMMER launch it at once; a late breach finds the SAMs already up. The briefing explains why this is a
@@ -51,8 +51,8 @@ warns at 20 nm and the fleet shoots inside 10 nm unless you authenticate before 
 - **HATCHET.** Spawned at start on the highest ground 1.2–3 km from the portal that has line of sight to it, hidden and
   immortal. radio menu > F10. Other > Deep Cut > Hatchet: laser on the door (code 1688); off on terminate or when the store is destroyed.
 - **Egress cover.** CHEVY, an AI Hornet CAP over the water (`lua/cap.lua`), is committed when Red fighters launch.
-  The strike Hornets carry two AIM-9X and an AMRAAM each. Enfield 1-2 trails its lead by 30 s to stay out of the
-  fragments; Springfield attacks 45 s after TOT off a different heading.
+  The strike Hornets carry two AIM-9X and an AMRAAM each. Enfield 1-2 trails its lead by 30 s on the same line to stay out
+  of the fragments.
 - **A pilot down over land** is sent to `Operation_Deep_Cut_Escape.miz` in the summary; over the water, the Navy picks them up.
 
 Flags at the end: 90 = 1 textbook, 2 success, 3 partial, 4 failure; 91 = a pilot is down over land; 92 = the score.

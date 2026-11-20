@@ -51,7 +51,7 @@ def deep_cut(miz, work):
     n = {k: cfg_num(c, k) for k in ("START", "TOT", "WINDOW", "HAMMER", "REPAIR", "SAM_UP", "REACT", "KILL_WINDOW",
                                    "FLOOR_FT", "GRACE", "DET_R", "POP_R", "ALERT_REACT", "BREACH_R", "TEAM_R_MIN", "TEAM_R_MAX",
                                    "PTS_BREACH", "PTS_KILL", "PTS_ONTIME", "PTS_UNSEEN", "PTS_SURVIVAL",
-                                   "PUSH_T", "SPRING_DELAY")}
+                                   "PUSH_T")}
     tot = n["TOT"]
     push = n["PUSH_T"]
     en = d["groups"]["Enfield"]["route"]
@@ -79,11 +79,10 @@ def deep_cut(miz, work):
         carrier=re.search(r'CARRIER = "([^"]+)"', c).group(1),
         carrier_short=re.search(r'CARRIER = "([^"]+)"', c).group(1).split(" ")[0],
         supercarrier="CVN-74" not in re.search(r'CARRIER = "([^"]+)"', c).group(1),
-        push=hms(push), push_z=hms(push - ZULU), spring_push=hms(push + n["SPRING_DELAY"]),
-        spring_tot=hms(tot + n["SPRING_DELAY"]), spring_tot_z=hms(tot + n["SPRING_DELAY"] - ZULU),
-        spring_delay=int(n["SPRING_DELAY"]), tgt_wp=i1, push_wp=i0,
+        push=hms(push), push_z=hms(push - ZULU),
+        tgt_wp=i1, push_wp=i0,
         hold_course=f"{bearing_dist(en[i0]['ll'], en[i0 + 1]['ll'])[0]:03.0f}", hold_by=hms(push - 300),
-        hold_en=f"{cfg_num(c, 'HOLD_EN_FT'):,.0f}", hold_sp=f"{cfg_num(c, 'HOLD_SP_FT'):,.0f}",
+        hold_ft=f"{cfg_num(c, 'HOLD_FT'):,.0f}",
         hold_leg=int(cfg_num(c, "HOLD_LEG_NM")),
         tot=hms(tot), tot_hm=hm(tot), tot_z=hms(tot - ZULU), tot_min=round((tot - n["START"]) / 60),
         window=int(n["WINDOW"]), win_on=hms(tot - n["WINDOW"]), win_off=hms(tot + n["WINDOW"]),

@@ -1,8 +1,8 @@
-<div class="kicker">Mission briefing · Enfield and Springfield · Deep Cut, mission 1{% if hard %}, hard{% endif %}</div>
+<div class="kicker">Mission briefing · Enfield · Deep Cut, mission 1{% if hard %}, hard{% endif %}</div>
 
 # Operation Deep Cut{% if hard %} (hard){% endif %}
 
-F/A-18C · 1–4 players · Caucasus · low-level gorge strike · cold start and recovery aboard {{ carrier_short }}{% if supercarrier %} (Supercarrier){% endif %}
+F/A-18C · 1–2 players · Caucasus · low-level gorge strike · cold start and recovery aboard {{ carrier_short }}{% if supercarrier %} (Supercarrier){% endif %}
 
 <div class="glance" markdown="1">
 
@@ -46,21 +46,20 @@ At **{{ hammer }}**, {{ hammer_lead }} minutes before TOT, HAMMER, a salvo of To
 
 ## Getting there on time
 
-**Hold at PUSH** (waypoint {{ push_wp }}), over the water short of the coast: a left-hand racetrack with {{ hold_leg }} nm legs, the inbound leg on **{{ hold_course }}°** ending at PUSH. That's the course to FEET DRY, so the push is straight ahead. **Enfield {{ hold_en }} ft, Springfield {{ hold_sp }} ft.** Be established by {{ hold_by }}, and time your last lap to cross PUSH inbound on the call.
+**Hold at PUSH** (waypoint {{ push_wp }}), over the water short of the coast: a left-hand racetrack with {{ hold_leg }} nm legs, the inbound leg on **{{ hold_course }}°** ending at PUSH. That's the course to FEET DRY, so the push is straight ahead. **{{ hold_ft }} ft.** Be established by {{ hold_by }}, and time your last lap to cross PUSH inbound on the call.
 
-MAGIC calls the push. You'll hear "five minutes to push" with the hold, then "one minute to push", then **PUSH PUSH** at **{{ push }}** for Enfield and at {{ spring_push }} for Springfield. Leave PUSH (waypoint {{ push_wp }}) on the call and fly the planned speeds on the route card; it gives the planned time at every waypoint to the target.
+MAGIC calls the push. You'll hear "five minutes to push" with the hold, then "one minute to push", then **PUSH PUSH** at **{{ push }}**. Leave PUSH (waypoint {{ push_wp }}) on the call and fly the planned speeds on the route card; it gives the planned time at every waypoint to the target.
 
-To let the jet do the sums, set the Hornet's TOT function: on the HSI DATA page, on the waypoint sequence (SEQUFC) page, enter TOT **{{ tot_z }}** Zulu (local time minus 4 hours on this map; Springfield {{ spring_tot_z }}) and set TGT to **waypoint {{ tgt_wp }}**. Leave the ground speed entry blank. The HSI then shows the ground speed you need to make the TOT. Fly that, and step through the waypoints in order: set the HSI to auto-sequence, or step it by hand at each one. radio menu > F10. Other > Deep Cut > Time check gives the push time, the TOT and how long is left.
+To let the jet do the sums, set the Hornet's TOT function: on the HSI DATA page, on the waypoint sequence (SEQUFC) page, enter TOT **{{ tot_z }}** Zulu (local time minus 4 hours on this map) and set TGT to **waypoint {{ tgt_wp }}**. Leave the ground speed entry blank. The HSI then shows the ground speed you need to make the TOT. Fly that, and step through the waypoints in order: set the HSI to auto-sequence, or step it by hand at each one. radio menu > F10. Other > Deep Cut > Time check gives the push time, the TOT and how long is left.
 
 ## The attack
 
 The blast door is a small target: a bomb counts only if it lands within **{{ hit_r }} m** of it. The first bomb that does brings the door down. A second bomb (another bomb, not the same one) within {{ hit_r }} m of the portal inside {{ kill_window }} seconds goes through and destroys the store. After that the inner door closes and the store survives.
 
-Each Hornet carries two GBU-12s and a LITENING pod, so one jet can do both: release both bombs in one pass, on the same laser spot, a fraction of a second apart. The plan for a full package:
+Each Hornet carries two GBU-12s and a LITENING pod, so one jet can do both: release both bombs in one pass, on the same laser spot, a fraction of a second apart. The plan for the two-ship, both on the same line up the gorge:
 
 - **Enfield 1-1** breaches at TOT.
 - **Enfield 1-2** puts the second bomb through 30 seconds later. Any closer and it flies through its lead's fragments and debris at 300 ft.
-- **Springfield** attacks 45 seconds after TOT off a different heading: pop out of the side valley west of the portal instead of coming straight up the gorge, so it doesn't share Enfield's frag pattern or its run-in. That is still inside the kill window in both versions.
 
 Players shoot when they have the shot.
 
@@ -96,7 +95,7 @@ The summary after the last jet is down gives you a score out of 100.
 
 ## Players
 
-Every slot is a client slot: in single player pick one (Enfield 1-1 is the lead), and one Hornet can win this on its own. In multiplayer, Enfield and Springfield are two pairs of strike Hornets. All four start cold on the deck.{% if supercarrier %} This version uses the Supercarrier ({{ carrier }}): everyone flying needs the Supercarrier module to start on the deck or catch a wire. Without it, fly the Stennis version, {{ miz | replace("_SC", "") }}.{% endif %}
+Every slot is a client slot: in single player pick one (Enfield 1-1 is the lead), and one Hornet can win this on its own. In multiplayer, Enfield is a pair of strike Hornets. Both start cold on the deck.{% if supercarrier %} This version uses the Supercarrier ({{ carrier }}): everyone flying needs the Supercarrier module to start on the deck or catch a wire. Without it, fly the Stennis version, {{ miz | replace("_SC", "") }}.{% endif %}
 <!-- /ingame -->
 
 <!-- task -->
@@ -107,11 +106,11 @@ Every slot is a client slot: in single player pick one (Enfield 1-1 is the lead)
 | Event | Local |
 |---|---|
 | Mission start, cold on the deck | {{ start }} |
-| Established in the hold at PUSH (Enfield {{ hold_en }} ft, Springfield {{ hold_sp }} ft) | {{ hold_by }} |
-| **Push: Enfield** (Springfield {{ spring_push }}) | **{{ push }}** |
+| Established in the hold at PUSH ({{ hold_ft }} ft) | {{ hold_by }} |
+| **Push** | **{{ push }}** |
 | HAMMER: TLAMs hit Red's air defence command post and fighter control | {{ hammer }} |
 | Window opens | {{ win_on }} |
-| **TOT: blast door** ({{ tot_z }}Z; Springfield {{ spring_tot }}) | **{{ tot }}** |
+| **TOT: blast door** ({{ tot_z }}Z) | **{{ tot }}** |
 | Window closes | {{ win_off }} |
 | Climb-out SAMs up if nothing has woken them | {{ sam_up }} |
 | Kutaisi alert airborne on the backup control (no earlier trigger) | {{ south_up }} |
@@ -124,7 +123,7 @@ Every slot is a client slot: in single player pick one (Enfield 1-1 is the lead)
 
 | Callsign | Who | |
 |---|---|---|
-| ENFIELD, SPRINGFIELD | Strike Hornets, two pairs | 251.0 AM |
+| ENFIELD | Strike Hornets, a pair | 251.0 AM |
 | HATCHET | Special forces team on the ridge, lases the door on your radio call | Radio menu, F10. Other |
 | CHEVY | Hornet CAP over the water, committed by MAGIC | 251.0 AM |
 | MAGIC | E-2C, calls the floor, the SAMs and the fighters | 255.0 AM |
@@ -158,7 +157,7 @@ The mission's commands are in the radio menu, under **F10. Other** (not the F10 
 
 <div class="keep" markdown="1">
 
-## Route card: Enfield and Springfield
+## Route card: Enfield
 
 | WP | Name | Coordinates | Altitude | Leg | Course | Time |
 |---|---|---|---|---|---|---|
@@ -166,7 +165,7 @@ The mission's commands are in the radio menu, under **F10. Other** (not the F10 
 | {{ r.wp }} | {{ r.name }} | {{ r.coords }} | {{ r.alt }} | {{ r.leg }} | {{ r.course }} | {{ r.time }} |
 {% endfor %}
 
-<p class="small">Times are Enfield's: Springfield adds {{ spring_delay }} seconds to every one, and its TGT time is locked {{ spring_delay }} seconds after Enfield's. The TGT coordinates are the planned point: use the exact ones the mission gives you. Planned target: MGRS {{ tgt_mgrs }}, {{ tgt_ddm }}.</p>
+<p class="small">Times are the lead's; Enfield 1-2 is 30 seconds behind. The TGT coordinates are the planned point: use the exact ones the mission gives you. Planned target: MGRS {{ tgt_mgrs }}, {{ tgt_ddm }}.</p>
 
 </div>
 
