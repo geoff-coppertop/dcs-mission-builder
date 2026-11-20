@@ -49,7 +49,7 @@ warns at 20 nm and the fleet shoots inside 10 nm unless you authenticate before 
 - **Survival is scored.** The summary scores 100 points: 40 target, 20 timing (on time, unseen), 40 shared across every
   player jet that launches and lands (aboard or a divert). The store must be destroyed for SUCCESS or TEXTBOOK.
 - **HATCHET.** Spawned at start on the highest ground 1.2–3 km from the portal that has line of sight to it, hidden and
-  immortal. F10 > Deep Cut > Hatchet: laser on the door (code 1688); off on terminate or when the store is destroyed.
+  immortal. radio menu > F10. Other > Deep Cut > Hatchet: laser on the door (code 1688); off on terminate or when the store is destroyed.
 - **Egress cover.** CHEVY, an AI Hornet CAP over the water (`lua/cap.lua`), is committed when Red fighters launch.
   The strike Hornets carry two AIM-9X and an AMRAAM each. Enfield 1-2 trails its lead by 30 s to stay out of the
   fragments; Springfield attacks 45 s after TOT off a different heading.

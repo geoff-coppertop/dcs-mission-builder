@@ -280,7 +280,7 @@ function T.init()
   missionCommands.addCommandForCoalition(N.BLUE, "Mission summary now", root, function() N.rec.summaryDone = false; N.recCheck(true) end)
   N.msg(C.NAME .. ". You're in the Tomcat on the " .. C.FIELD .. " ramp. HATCHET thinks the guards check this end at about " ..
         N.hms(C.START + C.DISCOVER) .. "L. Be gone by then. Once airborne, check in with MAGIC: code word " ..
-        C.CODE .. ". F10 > Escape.", 25)
+        C.CODE .. ". radio menu > F10. Other > Escape.", 25)
 end
 
 T.init()

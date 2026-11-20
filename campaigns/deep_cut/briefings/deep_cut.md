@@ -48,7 +48,7 @@ At **{{ hammer }}**, {{ hammer_lead }} minutes before TOT, HAMMER, a salvo of To
 
 MAGIC calls the push. You'll hear "one minute to push", then **PUSH PUSH** at **{{ push }}** for Enfield and at {{ spring_push }} for Springfield. Leave PUSH (waypoint {{ push_wp }}) on the call and fly the planned speeds on the route card; it gives the planned time at every waypoint to the target.
 
-To let the jet do the sums, set the Hornet's TOT function: on the HSI DATA page, on the waypoint sequence (SEQUFC) page, enter TOT **{{ tot_z }}** Zulu (local time minus 4 hours on this map; Springfield {{ spring_tot_z }}) and set TGT to **waypoint {{ tgt_wp }}**. Leave the ground speed entry blank. The HSI then shows the ground speed you need to make the TOT. Fly that, and step through the waypoints in order: set the HSI to auto-sequence, or step it by hand at each one. F10 > Deep Cut > Time check gives the push time, the TOT and how long is left.
+To let the jet do the sums, set the Hornet's TOT function: on the HSI DATA page, on the waypoint sequence (SEQUFC) page, enter TOT **{{ tot_z }}** Zulu (local time minus 4 hours on this map; Springfield {{ spring_tot_z }}) and set TGT to **waypoint {{ tgt_wp }}**. Leave the ground speed entry blank. The HSI then shows the ground speed you need to make the TOT. Fly that, and step through the waypoints in order: set the HSI to auto-sequence, or step it by hand at each one. radio menu > F10. Other > Deep Cut > Time check gives the push time, the TOT and how long is left.
 
 ## The attack
 
@@ -62,9 +62,9 @@ Each Hornet carries two GBU-12s and a LITENING pod, so one jet can do both: rele
 
 Players shoot when they have the shot.
 
-**HATCHET**, a special forces team, is dug in on the ridge {{ team_km }} km from the portal, on the highest ground there that can see the blast door. On your call (**F10 > Deep Cut > Hatchet: laser on the door**) they lase it on code 1688 until you call terminate or the store is destroyed. With HATCHET lasing, you can fly the pop-up and drop without working the pod; flying alone, that's the easier way to do it. Self-lasing works too.
+**HATCHET**, a special forces team, is dug in on the ridge {{ team_km }} km from the portal, on the highest ground there that can see the blast door. On your call (**radio menu > F10. Other > Deep Cut > Hatchet: laser on the door**) they lase it on code 1688 until you call terminate or the store is destroyed. With HATCHET lasing, you can fly the pop-up and drop without working the pod; flying alone, that's the easier way to do it. Self-lasing works too.
 
-The TGT waypoint is the planned point. The mission places the portal on the actual gorge floor at mission start. The exact coordinates are sent at start and in **F10 > Deep Cut > Target coordinates**, and the F10 map draws the gorge floor from the GATE to the portal. Enter the coordinates as a waypoint or markpoint before you push.
+The TGT waypoint is the planned point. The mission places the portal on the actual gorge floor at mission start. The exact coordinates are sent at start and in **radio menu > F10. Other > Deep Cut > Target coordinates**, and the F10 map draws the gorge floor from the GATE to the portal. Enter the coordinates as a waypoint or markpoint before you push.
 
 ## Getting out
 
@@ -122,13 +122,15 @@ Every slot is a client slot: in single player pick one (Enfield 1-1 is the lead)
 | Callsign | Who | |
 |---|---|---|
 | ENFIELD, SPRINGFIELD | Strike Hornets, two pairs | 251.0 AM |
-| HATCHET | Special forces team on the ridge, lases the door on call | F10 menu |
+| HATCHET | Special forces team on the ridge, lases the door on your radio call | Radio menu, F10. Other |
 | CHEVY | Hornet CAP over the water, committed by MAGIC | 251.0 AM |
 | MAGIC | E-2C, calls the floor, the SAMs and the fighters | 255.0 AM |
 | ARCO | S-3B tanker | 251.0 AM, TACAN 60Y |
 | MOTHER | {{ carrier }} | 127.5, TACAN 74X, ICLS 11 |
 
-F10 > Deep Cut: **Time check** (TOT, HAMMER, floor and SAM state), **Target coordinates** (the portal's exact position), **Hatchet: laser on the door**, **Hatchet: terminate**, **Mission summary now**.
+radio menu > F10. Other > Deep Cut: **Time check** (TOT, HAMMER, floor and SAM state), **Target coordinates** (the portal's exact position), **Hatchet: laser on the door**, **Hatchet: terminate**, **Mission summary now**.
+
+The mission's commands are in the radio menu, under **F10. Other** (not the F10 map key). In flight, open the radio menu with the Hornet's COMM switch: **COMM 1** (default Right Alt + backslash) or **COMM 2** (Right Ctrl + backslash). The generic backslash key only opens it on the deck.
 
 </div>
 <!-- /task -->

@@ -512,7 +512,7 @@ function T.init()
   at(C.TOT + C.SAM_UP, function() T.samsLive("Red alerted by HAMMER") end)
   at(C.TOT - 600, function()
     N.msg("MAGIC: Package check, TOT " .. N.clock(C.TOT) .. " in 10 minutes. Floor is " .. C.FLOOR_FT ..
-          " ft AGL from the gate at Jvari. HATCHET lases on call: F10 > Deep Cut.", 15)
+          " ft AGL from the gate at Jvari. HATCHET lases on call: radio menu > F10. Other > Deep Cut.", 15)
   end)
   timer.scheduleFunction(T.floorTick, nil, timer.getTime() + 1)
 
@@ -524,7 +524,7 @@ function T.init()
   missionCommands.addCommandForCoalition(N.BLUE, "Mission summary now", root, function() N.rec.summaryDone = false; N.recCheck(true) end)
 
   N.msg(C.NAME .. ". TOT " .. N.clock(C.TOT) .. ", window +/-" .. C.WINDOW .. " s. Radar floor " .. C.FLOOR_FT ..
-        " ft AGL. F10 > Deep Cut for time checks, the target's exact coordinates and HATCHET's laser.", 20)
+        " ft AGL. radio menu > F10. Other > Deep Cut for time checks, the target's exact coordinates and HATCHET's laser.", 20)
   timer.scheduleFunction(function() T.targetInfo() return nil end, nil, timer.getTime() + 5)
 end
 

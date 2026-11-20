@@ -46,7 +46,7 @@ Start the Tomcat, get airborne and get home to Mother.
 - **Get moving.** The stored-heading alignment takes about 3 minutes and runs while the engines spin up; a full alignment (about 8) won't finish before the guards arrive. The jet is noticed {{ notice }} seconds after you take off, when the guards arrive, or at once if you fire the gun on the field.
 - **Caught on the ground.** If you're noticed before you take off, guards turn out on foot and a BRDM-2 armoured car drives from the guard post straight at the jet. If the jet is still in its parking spot, you're captured on the spot. If it's already moving, you get about {{ caught }} seconds to be wheels-up; otherwise you're captured. The BRDM-2 is a real vehicle: don't taxi into it.
 - **The chase.** {{ react_min }} minutes after you're seen (relaying the report, then a scramble from cockpit readiness), two MiG-29s launch from Kutaisi, about 25 nm east. Get feet wet before they're up and they have to chase you into CHEVY, two Hornets on CAP off the coast, which MAGIC commits onto them. Slow on the ramp, or a long time over land, and they catch you.
-- **Identification.** Once you're airborne, F10 > Escape > Check in with MAGIC declares you friendly. Stay silent and it costs you:
+- **Identification.** Once you're airborne, radio menu > F10. Other > Escape > Check in with MAGIC declares you friendly. Stay silent and it costs you:
     - In the ID zone ({{ id_nm }} nm from Mother), CHEVY is committed to intercept you, **ahead of the MiGs**. It can't cover you from them until you're identified, by checking in or by CHEVY getting close enough to see you.
     - Inside {{ warn_nm }} nm, Mother warns you off. Inside **{{ fleet_nm }} nm**, still unidentified, the fleet fires. Checking in while the missiles are in the air aborts them.
 
@@ -76,7 +76,9 @@ Start the Tomcat, get airborne and get home to Mother.
 | ARCO | S-3B tanker | 251.0 AM, TACAN 60Y |
 | MOTHER | {{ carrier }} | 127.5, TACAN 74X, ICLS 11 |
 
-F10 > Escape: **Status** (seen or not, identified or not, fighters, CAP), **Check in with MAGIC ({{ code }})** (airborne only), **Mission summary now**.
+radio menu > F10. Other > Escape: **Status** (seen or not, identified or not, fighters, CAP), **Check in with MAGIC ({{ code }})** (airborne only), **Mission summary now**.
+
+The mission's commands are in the radio menu, under **F10. Other** (not the F10 map key). In flight, open the radio menu with the Tomcat's radio push-to-talk; the generic backslash key only opens it on the ground.
 <!-- /task -->
 
 <div class="pagebreak"></div>
