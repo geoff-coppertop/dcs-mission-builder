@@ -21,7 +21,7 @@ from missionbuilder.paths import read_lua
 from missionbuilder.red_arms import arm
 
 START = datetime.datetime(2027, 1, 14, 10, 0, 0)     # winter, mid-morning (Caucasus local = Z+4)
-TOT_OFFSET = 45 * 60                                 # cold start, ~60 nm to PUSH, the run in
+TOT_OFFSET = 40 * 60                                 # cold start, ~60 nm to PUSH, the run in
 
 VARIANTS = {
     "standard": dict(file="Operation_Deep_Cut.miz", title="Operation Deep Cut", tag="",
