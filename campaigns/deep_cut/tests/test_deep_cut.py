@@ -3,7 +3,7 @@ import re
 import sys
 from testing.mockdcs import make, text, scripts_from_miz
 
-FILES = sys.argv[1:] or ["Operation_Deep_Cut.miz", "Operation_Deep_Cut_Hard.miz"]
+FILES = sys.argv[1:] or ["Operation_Deep_Cut.miz", "Operation_Deep_Cut_Hard.miz", "Operation_Deep_Cut_SC.miz", "Operation_Deep_Cut_Hard_SC.miz"]
 
 
 def num(cfg, key):
@@ -14,7 +14,8 @@ def suite(path):
     SCRIPTS = scripts_from_miz(path)
     cfg = SCRIPTS[-1]
     V = {k: num(cfg, k) for k in ("START", "TOT", "WINDOW", "HAMMER", "REPAIR", "SAM_UP", "REACT", "KILL_WINDOW",
-                                  "FLOOR_FT", "GRACE", "DET_R", "POP_R", "ALERT_REACT")}
+                                  "FLOOR_FT", "GRACE", "DET_R", "POP_R", "ALERT_REACT", "PUSH_T", "SPRING_DELAY")}
+    CARRIER = re.search(r'CARRIER = "([^"]+)"', cfg).group(1)
     TX, TZ = (float(v) for v in re.search(r"TGT = \{ x = (-?[\d.]+), z = (-?[\d.]+)", cfg).groups())
     hard = "(HARD)" in cfg
     # A V-shaped gorge running NE-SW, its floor 800 m south-east of the planned target point:
@@ -36,7 +37,8 @@ M.mkGroup("Red South", {{ M.mkUnit("Red South 1", {TX} - 70000, {TZ} + 30000), M
 M.mkGroup("Red North", {{ M.mkUnit("Red North 1", {TX} + 25000, {TZ} + 20000) }})
 -- players start far out at sea, well outside the radar-floor zone
 M.mkGroup("Chevy", {{ M.mkUnit("Chevy 1-1", {TX} - 100000, {TZ} - 100000), M.mkUnit("Chevy 1-2", {TX} - 100100, {TZ} - 100000) }})
-M.mkGroup("CVN-74 Stennis", {{ M.mkUnit("CVN-74 Stennis", {TX} - 150000, {TZ} - 150000) }})
+M.mkGroup("{CARRIER}", {{ M.mkUnit("{CARRIER}", {TX} - 150000, {TZ} - 150000) }})
+M.carrierName = "{CARRIER}"
 LEAD = M.player("Geoff", "Enfield 1-1", {TX} - 90000, {TZ} - 90000, 45, 1000)
 WING = M.player("Wing", "Enfield 1-2", {TX} - 90100, {TZ} - 90000, 45, 1000)
 """
@@ -134,6 +136,38 @@ LEAD.p.y = land.getHeight({ x = LEAD.p.x, y = LEAD.p.z }) + 3000 * 0.3048
 M.advance(TOT - 30)
 """, c_pop)
 
+    def c_water(L, M, t):
+        assert "you're above the floor" not in t and "Red's radar" not in t
+    run("Over the reservoir the floor counts from the water, not the bed", BOMB + """
+launch()
+M.advance(TOT - 600)
+local tg = DC.s.tgt
+M.surfaceFn = function(x, z) return land.getHeight({ x = x, y = z }) + 400 end     -- 400 m of water
+LEAD.p = { x = tg.x - (POP_R + DET_R) / 2, y = 0, z = tg.z }
+LEAD.p.y = land.getHeight({ x = LEAD.p.x, y = LEAD.p.z }) + 400 + (FLOOR_FT - 150) * 0.3048
+M.advance(TOT - 600 + GRACE + 3)
+""", c_water)
+
+    def c_dam(L, M, t):
+        assert "you're above the floor" not in t and "Red's radar" not in t
+    run("Crossing the dam crest is measured from the crest", BOMB + """
+launch()
+M.advance(TOT - 600)
+local tg = DC.s.tgt
+local cx, cz = tg.x - (POP_R + DET_R) / 2, tg.z
+local base = M.heightFn
+M.heightFn = function(x, z)                                -- a 250 m wall just ahead of the jet
+  if x > cx + 90 and x < cx + 160 then return base(x, z) + 250 end
+  return base(x, z)
+end
+LEAD.p = { x = cx, y = base(cx, cz) + 250 + (FLOOR_FT - 150) * 0.3048, z = cz }
+M.advance(TOT - 600 + GRACE + 3)
+""", c_dam)
+
+    def c_push(L, M, t):
+        assert "Enfield, one minute to push" in t and "Enfield, PUSH PUSH" in t and "Springfield, PUSH PUSH" in t
+    run("MAGIC calls the push", "M.advance(PUSH_T + SPRING_DELAY + 2)", c_push)
+
     if not hard:
         def c_warn(L, M, t):
             assert "Enfield 1-1, you're above the floor" in t and "Red's radar" not in t
@@ -230,7 +264,9 @@ M.advance(TOT + 10)
 """, c_laser)
 
     def c_eject(L, M, t):
-        assert "Also fly Operation_Deep_Cut_Escape.miz to bring the downed pilot home." in t
+        nxt = re.search(r'NEXT_ESCAPE = "([^"]+)"', cfg).group(1)
+        assert nxt == ("Operation_Deep_Cut_Escape_SC.miz" if "_SC" in str(path) else "Operation_Deep_Cut_Escape.miz")
+        assert f"Also fly {nxt} to bring the downed pilot home." in t
         assert M.flags["91"] is True
     run("A pilot down over land goes to the escape mission", BOMB + """
 launch()

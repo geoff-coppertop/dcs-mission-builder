@@ -90,10 +90,14 @@ class Builder:
         return brg, 2 * 6371000 * math.asin(math.sqrt(h)) / 1852
 
     # ------------------------------------------------------------ carrier
-    def carrier(self, start=(42.150, 40.750), recovery_min=50, speed_kmh=50):
+    def carrier(self, start=(42.150, 40.750), recovery_min=50, speed_kmh=50, ship=Stennis):
+        """ship: Stennis (free) or a Supercarrier hull (dcs.ships.CVN_71/72/73/75; players need the module).
+        The unit is named after the ship's short name, e.g. "CVN-74 Stennis" or "CVN-71 Theodore Roosevelt";
+        self.cvn_name holds it for scripts that need to recognise the deck."""
         p = self.P(*start)
-        cvn = self.m.ship_group(self.usa, "CVN-74 Stennis", Stennis, p, heading=270)
-        cvn.units[0].name = "CVN-74 Stennis"
+        self.cvn_name = "CVN-74 Stennis" if ship is Stennis else ship.name
+        cvn = self.m.ship_group(self.usa, self.cvn_name, ship, p, heading=270)
+        cvn.units[0].name = self.cvn_name
         u = cvn.units[0]
         wp0 = cvn.points[0]
         wp0.speed = speed_kmh / 3.6
@@ -223,7 +227,8 @@ class Builder:
     def add_cap_scripts(self, label, fleet_only=False):
         """CAPCFG + cap.lua (controller-run CAP with alert relief); call before the mission script.
         label names the player's area that commits and cover requests go to (the builder's commit point)."""
-        self.add_script(cap_lua_cfg(self.cap_station, fleet_only=fleet_only, req=self.cap_commit, req_label=label))
+        self.add_script(cap_lua_cfg(self.cap_station, fleet_only=fleet_only, req=self.cap_commit, req_label=label,
+                                    carrier=getattr(self, "cvn_name", "CVN-74 Stennis")))
         self.add_script(read_lua("cap.lua"))
 
     def drone(self, center, name="Pontiac", alt_m=4500):

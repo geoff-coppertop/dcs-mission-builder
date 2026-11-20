@@ -7,10 +7,13 @@ from missionbuilder import briefing
 # (mission file, briefing template, context function in context.py, footer title)
 MISSIONS = [
     ("Operation_Deep_Cut.miz", "deep_cut.md", "deep_cut", "Operation Deep Cut"),
+    ("Operation_Deep_Cut_SC.miz", "deep_cut.md", "deep_cut", "Operation Deep Cut (Supercarrier)"),
     ("Operation_Deep_Cut_Hard.miz", "deep_cut.md", "deep_cut", "Operation Deep Cut (hard)"),
+    ("Operation_Deep_Cut_Hard_SC.miz", "deep_cut.md", "deep_cut", "Operation Deep Cut (hard, Supercarrier)"),
     ("Operation_Deep_Cut_Escape.miz", "escape.md", "escape", "Operation Deep Cut: Escape"),
+    ("Operation_Deep_Cut_Escape_SC.miz", "escape.md", "escape", "Operation Deep Cut: Escape (Supercarrier)"),
 ]
-TESTS = {"Operation_Deep_Cut_Escape.miz": "tests/test_escape.py"}
+TESTS = {"Operation_Deep_Cut_Escape.miz": "tests/test_escape.py", "Operation_Deep_Cut_Escape_SC.miz": "tests/test_escape.py"}
 ROOT = Path(__file__).resolve().parents[2]
 
 

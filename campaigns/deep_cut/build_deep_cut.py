@@ -13,6 +13,7 @@ import sys
 
 from dcs import task, mapping
 from dcs.planes import FA_18C_hornet as HN, MiG_21Bis, MiG_29S, Su_27
+from dcs.ships import Stennis, CVN_71
 from dcs.unit import Skill
 
 from missionbuilder.builder import Builder, W, FT, KTS
@@ -58,9 +59,18 @@ def lua_pt(p):
     return f"x = {p.x:.1f}, z = {p.y:.1f}"
 
 
-def build(key):
+SC_SHIP = CVN_71                    # the Supercarrier versions: CVN-71 Theodore Roosevelt (players need the module)
+SPRING_DELAY = 45                   # Springfield's TGT time after Enfield's
+
+
+def sc_file(f, sc):
+    return f.replace(".miz", "_SC.miz") if sc else f
+
+
+def build(key, sc=False):
     v = VARIANTS[key]
-    b = Builder(v["title"], START, v["file"])
+    title = v["title"] + (" (Supercarrier)" if sc else "")
+    b = Builder(title, START, sc_file(v["file"], sc))
     P = b.P
     b.m.weather.season_temperature = -4
     s0 = b.start_s
@@ -73,7 +83,7 @@ def build(key):
     det_r = round(tgt.distance_to_point(pts["GATE"]) + 2000, -2)
     pop_r = 7000
 
-    b.carrier(start=CVN_START, recovery_min=65)
+    b.carrier(start=CVN_START, recovery_min=65, ship=SC_SHIP if sc else Stennis)
     cvn = b.cvn_start
 
     # ------------------------------------------------------------ Blue
@@ -95,12 +105,20 @@ def build(key):
                 ("FEET WET", pts["FEET_DRY"], 1000, 480),
                 ("TANKER", pts["TANKER"], 15000, 300)]
 
-    b.flight("Enfield", HN, [strike, strike], strike_route(), 1, [Skill.Player, Skill.Client],
+    # every flyable slot is Client: Player slots can't be taken in multiplayer, and Client slots are
+    # selectable in single player too
+    b.flight("Enfield", HN, [strike, strike], strike_route(), 1, [Skill.Client, Skill.Client],
              eta={"TGT": TOT_OFFSET})
     # Enfield 1-2 trails 30 s to stay out of its lead's fragments; Springfield attacks 45 s after TOT off a
     # different heading (see the briefing), inside the kill window in both variants
     b.flight("Springfield", HN, [strike, strike], strike_route(), 2, [Skill.Client, Skill.Client],
-             eta={"TGT": TOT_OFFSET + 45})
+             eta={"TGT": TOT_OFFSET + SPRING_DELAY})
+    # PUSH time: TOT less the planned time from PUSH to TGT at each leg's planned speed; MAGIC calls it
+    legs = strike_route()
+    i0, i1 = [l[0] for l in legs].index("PUSH"), [l[0] for l in legs].index("TGT")
+    run_s = sum(legs[i][1].distance_to_point(legs[i - 1][1]) / (legs[i][3] * 1852 / 3600)  # knots -> m/s
+                for i in range(i0 + 1, i1 + 1))
+    push_t = round(tot - run_s)
     b.tanker(pts["TANKER"])
     b.awacs()
     b.cap(pts["CAP"], commit_point=pts["FEET_DRY"])      # CHEVY: offshore, committed by MAGIC on the egress fighters
@@ -164,19 +182,21 @@ def build(key):
   SOUTH_BASE = "Kutaisi", ALERT_REACT = 90,
   TEAM = "Hatchet", TEAM_R_MIN = 1200, TEAM_R_MAX = 3000, LASER_CODE = 1688,
   JETS = {{ "Enfield 1-1", "Enfield 1-2", "Springfield 1-1", "Springfield 1-2" }},
-  NEXT_ESCAPE = "Operation_Deep_Cut_Escape.miz", RESCUE_FLAG = "91",
+  NEXT_ESCAPE = "{sc_file('Operation_Deep_Cut_Escape.miz', sc)}", RESCUE_FLAG = "91",
+  CARRIER = "{b.cvn_name}", PUSH_T = {push_t}, SPRING_DELAY = {SPRING_DELAY},
   PTS_BREACH = 15, PTS_KILL = 25, PTS_ONTIME = 12, PTS_UNSEEN = 8, PTS_SURVIVAL = 40,
   OUTCOME_FLAG = "90", SCORE_FLAG = "92",
 }}
 """
     b.add_cap_scripts("the coast")
     b.add_script(read_lua("common.lua"))
-    b.add_script(read_lua("deep_cut.lua"), cfg, keep_copy=f"deep_cut_{key}_built.lua")
+    b.add_script(read_lua("deep_cut.lua"), cfg, keep_copy=f"deep_cut_{key}{'_sc' if sc else ''}_built.lua")
     # Briefing text comes from briefings/deep_cut.md: build.py renders it and writes it into the .miz.
-    b.save(v["title"], "See the mission briefing.", "See the mission briefing.")
+    b.save(title, "See the mission briefing.", "See the mission briefing.")
     return b
 
 
 if __name__ == "__main__":
     for k in (sys.argv[1:] or ["standard", "hard"]):
-        build(k)
+        for sc in (False, True):
+            build(k, sc)

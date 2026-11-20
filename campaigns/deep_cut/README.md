@@ -16,13 +16,30 @@ behind them and fighters heading for the gorge mouth.
 |---|---|
 | `Operation_Deep_Cut.miz` | Standard: 500 ft floor with a warning, ±45 s window, 90 s to make the kill, SA-6 and SA-8 at the climb-out, MiG-29s and MiG-21s |
 | `Operation_Deep_Cut_Hard.miz` | Hard: 300 ft floor, no warning, ±30 s window, 60 s for the kill, SA-11 and SA-15/SA-8, a ZSU-23-4 in the gorge, MiG-29s and Su-27s, Kutaisi back up sooner |
-| `Operation_Deep_Cut_Escape.miz` | Follow-up, flown when a pilot ejects over land in either variant: steal Red's F-14A (an F-14A-135-GR in ex-export paint), readied for a ferry flight: full fuel and tanks, gun only, start cart hooked up. The base is on alert after the raid (guards at +9 min, enough for a stored-heading INS start and the taxi; if they come before you're airborne, infantry spawn and a late-activated BRDM-2 drives at the jet; still parked, you're captured, already taxiing, you get 60 s to be airborne; MiG-29s about 6 min after you're seen: the report relayed through the sector, then a cockpit-readiness scramble). The pilot is the air wing commander, who flew F-14Ds before the type retired in 2006. Outrun the MiGs to the coast, where CHEVY holds CAP. 1 player, or 2 with a RIO. Check in with MAGIC (code word KESTREL). Silent, you're an unknown: in the ID zone (80 nm from Mother) CHEVY intercepts you ahead of the MiGs (`cap.lua` kind `ident`); Mother warns at 20 nm and the fleet shoots inside 10 nm unless you authenticate before the missiles arrive |
+| `Operation_Deep_Cut_Escape.miz` | Follow-up, flown when a pilot ejects over land in either variant (see below) |
+| `*_SC.miz` | The same three on the Supercarrier (CVN-71 Theodore Roosevelt). Everyone flying needs the Supercarrier module to start on the deck or trap; the plain files use the free Stennis |
+
+Every flyable slot is a Client slot. A Player slot can't be taken in multiplayer, and Client slots are selectable in
+single player too.
+
+**Escape.** Steal Red's F-14A (an F-14A-135-GR in ex-export paint), readied for a ferry flight: full fuel and tanks,
+gun only, start cart hooked up. The base is on alert after the raid (guards at +9 min, enough for a stored-heading
+INS start and the taxi; if they come before you're airborne, infantry spawn and a late-activated BRDM-2 drives at the
+jet; still parked, you're captured, already taxiing, you get 60 s to be airborne; MiG-29s about 6 min after you're
+seen). The pilot is the air wing commander, who flew F-14Ds before the type retired in 2006. Outrun the MiGs to the
+coast, where CHEVY holds CAP. 1 player, or 2 with a RIO. Check in with MAGIC (code word KESTREL). Silent, you're an
+unknown: in the ID zone (80 nm from Mother) CHEVY intercepts you ahead of the MiGs (`cap.lua` kind `ident`); Mother
+warns at 20 nm and the fleet shoots inside 10 nm unless you authenticate before the missiles arrive.
 
 ## What drives it
 
 - **Radar floor.** From the gorge mouth to 3.8 nm from the portal, any player jet more than the floor height above
-  the ground for a few seconds is seen: the climb-out SAMs come up, the northern alert launches, and before HAMMER the
-  Kutaisi alert does too. Escorts count, so they hold west of the gorge until the first bomb.
+  the surface for a few seconds is seen: the climb-out SAMs come up, the northern alert launches, and before HAMMER the
+  Kutaisi alert does too. Height is measured from the highest surface within 150 m, taking the water level over the
+  reservoir (`land.getSurfaceHeightWithSeabed`), so the dam's crest and the lake count, not the gorge 270 m below the
+  dam or the reservoir's bed.
+- **Push.** The builder works out the push time from the planned leg speeds between PUSH and TGT; MAGIC calls it
+  (Enfield, then Springfield 45 s later) and the briefing gives the Hornet TOT setup and a time at every waypoint.
 - **Timing.** HAMMER, a scripted TLAM strike, destroys the sector air defence command post and Kutaisi's
   fighter-control radar three minutes before TOT; Kutaisi's alert waits for the backup (10 minutes, 7 hard). Bombs
   before HAMMER launch it at once; a late breach finds the SAMs already up. The briefing explains why this is a

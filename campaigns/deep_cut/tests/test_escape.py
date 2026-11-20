@@ -6,18 +6,20 @@ from testing.mockdcs import make, text, scripts_from_miz
 PATH = sys.argv[1] if len(sys.argv) > 1 else "Operation_Deep_Cut_Escape.miz"
 SCRIPTS = scripts_from_miz(PATH)
 cfg = SCRIPTS[-1]
+CARRIER = re.search(r'CARRIER = "([^"]+)"', cfg).group(1)
 START = float(re.search(r"START = (\d+)", cfg).group(1))
 DISCOVER = float(re.search(r"DISCOVER = (\d+)", cfg).group(1))
 REACT = float(re.search(r"ALERT_REACT = (\d+)", cfg).group(1))
 PX, PZ = (float(v) for v in re.search(r"PARK = \{ x = (-?[\d.]+), z = (-?[\d.]+) \}", cfg).groups())
 
-SETUP = """
+SETUP = f"""
 local M = MOCKSTATE
-for _, g in ipairs({ "Senaki Guns North", "Senaki Guns South", "Senaki SA-13" }) do M.mkGroup(g, { M.mkUnit(g .. " 1", 0, 0) }) end
-M.mkGroup("Red South", { M.mkUnit("Red South 1", 5000, 40000), M.mkUnit("Red South 2", 5000, 40100) })
-M.mkGroup("Senaki Guard Car", { M.mkUnit("Senaki BRDM-2", 100, 100) })
-M.mkGroup("Chevy", { M.mkUnit("Chevy 1-1", -10000, -80000), M.mkUnit("Chevy 1-2", -10100, -80000) })
-M.mkGroup("CVN-74 Stennis", { M.mkUnit("CVN-74 Stennis", -20000, -300000) })
+for _, g in ipairs({{ "Senaki Guns North", "Senaki Guns South", "Senaki SA-13" }}) do M.mkGroup(g, {{ M.mkUnit(g .. " 1", 0, 0) }}) end
+M.mkGroup("Red South", {{ M.mkUnit("Red South 1", 5000, 40000), M.mkUnit("Red South 2", 5000, 40100) }})
+M.mkGroup("Senaki Guard Car", {{ M.mkUnit("Senaki BRDM-2", 100, 100) }})
+M.mkGroup("Chevy", {{ M.mkUnit("Chevy 1-1", -10000, -80000), M.mkUnit("Chevy 1-2", -10100, -80000) }})
+M.mkGroup("{CARRIER}", {{ M.mkUnit("{CARRIER}", -20000, -300000) }})
+M.carrierName = "{CARRIER}"
 JET = M.player("Geoff", "Enfield 1-1", 0, 0, 270, 10)
 """
 

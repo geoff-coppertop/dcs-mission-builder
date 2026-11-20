@@ -44,7 +44,12 @@ world = { event = { S_EVENT_SHOT = 1, S_EVENT_HIT = 2, S_EVENT_TAKEOFF = 3, S_EV
 land = { isVisible = function() return true end,
          getHeight = function(p) if M.heightFn then return M.heightFn(p.x, p.y) end return 12 end,
          SurfaceType = { LAND = 1, SHALLOW_WATER = 2, WATER = 3, ROAD = 4, RUNWAY = 5 },
-         getSurfaceType = function(p) if M.waterFn and M.waterFn(p.x, p.y) then return 3 end return 1 end }
+         getSurfaceType = function(p) if M.waterFn and M.waterFn(p.x, p.y) then return 3 end return 1 end,
+         -- surface (water level over a lake) and depth; a test sets M.surfaceFn(x, z) for a reservoir
+         getSurfaceHeightWithSeabed = function(p)
+           if M.surfaceFn then return M.surfaceFn(p.x, p.y), 0 end
+           return land.getHeight(p), 0
+         end }
 coord = { LOtoLL = function(p) return 42.74, 41.505, 0 end,
           LLtoMGRS = function() return { UTMZone = "37T", MGRSDigraph = "GH", Easting = 123, Northing = 45678 } end }
 missionCommands = {
@@ -154,7 +159,8 @@ function M.weapon(x, z, fall, kind)
   end
   return w
 end
-function M.carrier() return { getName = function() return "CVN-74 Stennis" end } end
+M.carrierName = "CVN-74 Stennis"
+function M.carrier() return { getName = function() return M.carrierName end } end
 function M.text() local t = {} for i = 1, #M.msgs do t[#t+1] = M.msgs[i] end return table.concat(t, "\n") end
 """
 

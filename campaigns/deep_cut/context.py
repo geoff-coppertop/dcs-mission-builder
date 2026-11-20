@@ -50,8 +50,10 @@ def deep_cut(miz, work):
     hard = "(HARD)" in c
     n = {k: cfg_num(c, k) for k in ("START", "TOT", "WINDOW", "HAMMER", "REPAIR", "SAM_UP", "REACT", "KILL_WINDOW",
                                    "FLOOR_FT", "GRACE", "DET_R", "POP_R", "ALERT_REACT", "BREACH_R", "TEAM_R_MIN", "TEAM_R_MAX",
-                                   "PTS_BREACH", "PTS_KILL", "PTS_ONTIME", "PTS_UNSEEN", "PTS_SURVIVAL")}
+                                   "PTS_BREACH", "PTS_KILL", "PTS_ONTIME", "PTS_UNSEEN", "PTS_SURVIVAL",
+                                   "PUSH_T", "SPRING_DELAY")}
     tot = n["TOT"]
+    push = n["PUSH_T"]
     en = d["groups"]["Enfield"]["route"]
     wp = {p["name"]: p for p in en}
     tgt = cfg_pt(c, "TGT")
@@ -65,10 +67,21 @@ def deep_cut(miz, work):
     valley = [s for s in st if s[1] in ("valley", "guard")]
     south_kind = re.search(r'SOUTH_KIND = "([^"]+)"', c).group(1)
     north_kind = re.search(r'NORTH_KIND = "([^"]+)"', c).group(1)
-    times = {"PUSH": "~" + hms(tot - (run_min + 1) * 60) + " push", "GATE": "~" + hms(tot - canyon / 460 * 3600),
-             "TGT": f"**{hms(tot)}**"}
+    # planned time at each waypoint from PUSH to TGT, at each leg's planned speed (the same sum the builder used)
+    names = [p["name"] for p in en]
+    i0, i1 = names.index("PUSH"), names.index("TGT")
+    times, t = {"PUSH": f"**{hms(push)}** push"}, push
+    for i in range(i0 + 1, i1 + 1):
+        t += bearing_dist(en[i - 1]["ll"], en[i]["ll"])[1] * NM / en[i]["speed"]
+        times[en[i]["name"]] = f"**{hms(tot)}**" if en[i]["name"] == "TGT" else hms(t)
     return dict(
-        miz=Path(miz).name, hard=hard, start=hm(n["START"]), start_z=hms(n["START"] - ZULU),
+        miz=Path(miz).name, stem=Path(miz).stem, hard=hard, start=hm(n["START"]), start_z=hms(n["START"] - ZULU),
+        carrier=re.search(r'CARRIER = "([^"]+)"', c).group(1),
+        carrier_short=re.search(r'CARRIER = "([^"]+)"', c).group(1).split(" ")[0],
+        supercarrier="CVN-74" not in re.search(r'CARRIER = "([^"]+)"', c).group(1),
+        push=hms(push), push_z=hms(push - ZULU), spring_push=hms(push + n["SPRING_DELAY"]),
+        spring_tot=hms(tot + n["SPRING_DELAY"]), spring_tot_z=hms(tot + n["SPRING_DELAY"] - ZULU),
+        spring_delay=int(n["SPRING_DELAY"]), tgt_wp=i1, push_wp=i0,
         tot=hms(tot), tot_hm=hm(tot), tot_z=hms(tot - ZULU), tot_min=round((tot - n["START"]) / 60),
         window=int(n["WINDOW"]), win_on=hms(tot - n["WINDOW"]), win_off=hms(tot + n["WINDOW"]),
         hammer=hms(n["HAMMER"]), hammer_lead=round((tot - n["HAMMER"]) / 60), repair_min=round(n["REPAIR"] / 60),
@@ -94,7 +107,9 @@ def escape(miz, work):
     en = d["groups"]["Enfield"]
     fuel_lb = None
     code = re.search(r'CODE = "([^"]+)"', c).group(1)
-    return dict(miz=Path(miz).name, code=code, id_nm=f"{cfg_num(c, 'ID_R') / NM:.0f}", fleet_nm=f"{cfg_num(c, 'FLEET_R') / NM:.0f}", warn_nm=f"{cfg_num(c, 'FLEET_WARN_R') / NM:.0f}",
+    carrier = re.search(r'CARRIER = "([^"]+)"', c).group(1)
+    return dict(miz=Path(miz).name, stem=Path(miz).stem, carrier=carrier, carrier_short=carrier.split(" ")[0],
+                supercarrier="CVN-74" not in carrier, code=code, id_nm=f"{cfg_num(c, 'ID_R') / NM:.0f}", fleet_nm=f"{cfg_num(c, 'FLEET_R') / NM:.0f}", warn_nm=f"{cfg_num(c, 'FLEET_WARN_R') / NM:.0f}",
                 start=hm(start), start_z=hms(start - ZULU), discover=hms(start + disc),
                 discover_min=round(disc / 60), react=int(react), react_min=round(react / 60), caught=int(cfg_num(c, "CAUGHT_WINDOW")), notice=int(cfg_num(c, "TAKEOFF_NOTICE")),
                 route=route(d, "Enfield"), load=loadout(d, "Enfield"))

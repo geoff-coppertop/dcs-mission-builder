@@ -28,15 +28,18 @@ ALERT_REACT = 6 * 60                                 # Kutaisi's alert after the
 COAST = (42.200, 41.640)                             # feet wet, south of the Enguri mouth
 
 
-def build():
-    b = Builder("Operation Deep Cut: Escape", START, "Operation_Deep_Cut_Escape.miz")
+def build(sc=False):
+    from dcs.ships import Stennis, CVN_71
+    title = "Operation Deep Cut: Escape" + (" (Supercarrier)" if sc else "")
+    b = Builder(title, START, "Operation_Deep_Cut_Escape_SC.miz" if sc else "Operation_Deep_Cut_Escape.miz")
     b.m.weather.season_temperature = -6
     P = b.P
     field = b.terrain.airports["Senaki-Kolkhi"]
     fp = field.position
     coast = P(*COAST)
 
-    b.carrier(start=(42.150, 39.750), recovery_min=40)     # ~85 nm off the coast, ~100 nm by recovery
+    b.carrier(start=(42.150, 39.750), recovery_min=40,      # ~85 nm off the coast, ~100 nm by recovery
+              ship=CVN_71 if sc else Stennis)
     b.tanker(P(42.30, 40.95))
     b.awacs()
     b.cap(P(42.25, 41.25), commit_point=coast)
@@ -46,7 +49,7 @@ def build():
     g = b.m.flight_group_from_airport(iran, "Enfield", F14A, field, maintask=task.CAP,
                                       start_type=dcs.mission.StartType.Cold, group_size=1)
     u = g.units[0]
-    u.name, u.skill = "Enfield 1-1", Skill.Player
+    u.name, u.skill = "Enfield 1-1", Skill.Client       # Client: a Player slot can't be taken in multiplayer
     u.callsign_dict = {1: 1, 2: 1, 3: 1, "name": "Enfield11"}
     u.pylons.clear()
     for st, store in {3: F14A.Pylon3.Fuel_tank_300_gal_, 8: F14A.Pylon8.Fuel_tank_300_gal_}.items():
@@ -102,7 +105,7 @@ def build():
   FIELD = "Senaki-Kolkhi", FIELD_AD = {{ "Senaki Guns North", "Senaki Guns South", "Senaki SA-13" }},
   SOUTH_GROUP = "Red South", SOUTH_KIND = "two MiG-29s", SOUTH_BASE = "Kutaisi",
   JET = "Enfield 1-1", OUTCOME_FLAG = "90",
-  CODE = "KESTREL", CARRIER = "CVN-74 Stennis", ID_R = 148160, VID_R = 3700, VID_S = 8,
+  CODE = "KESTREL", CARRIER = "{b.cvn_name}", ID_R = 148160, VID_R = 3700, VID_S = 8,
   FLEET_WARN_R = 37040, FLEET_R = 18520, MISSILE_TOF = 20,
   PARK = {{ x = {park.x:.1f}, z = {park.y:.1f} }}, PARK_R = 30, CAUGHT_WINDOW = 60,
   GUARD_CAR = "Senaki Guard Car", GUARDS = "Senaki Guards", GUARD_TYPE = "Soldier AK",
@@ -110,9 +113,10 @@ def build():
 """
     b.add_cap_scripts("the coast")
     b.add_script(read_lua("common.lua"))
-    b.add_script(read_lua("escape.lua"), cfg, keep_copy="escape_built.lua")
-    b.save("Operation Deep Cut: Escape", "See the mission briefing.", "See the mission briefing.")
+    b.add_script(read_lua("escape.lua"), cfg, keep_copy=f"escape{'_sc' if sc else ''}_built.lua")
+    b.save(title, "See the mission briefing.", "See the mission briefing.")
 
 
 if __name__ == "__main__":
-    build()
+    for sc in (False, True):
+        build(sc)

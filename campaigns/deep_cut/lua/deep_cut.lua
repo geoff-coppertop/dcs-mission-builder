@@ -41,6 +41,28 @@ local S = T.s
 ------------------------------------------------------------------ terrain
 local function h(x, z) return land.getHeight({ x = x, y = z }) end
 
+-- the surface a jet flies over: land.getHeight gives a lake's bed, so over the reservoir take the water level
+local function surf(x, z)
+  local g = h(x, z)
+  if land.getSurfaceHeightWithSeabed then
+    local ok, s = pcall(land.getSurfaceHeightWithSeabed, { x = x, y = z })
+    if ok and type(s) == "number" and s > g then return s end
+  end
+  return g
+end
+
+-- the radar floor is measured from the highest surface within FLOOR_RING m: crossing the dam's crest, or a
+-- spur in the gorge, the reference is the crest, not the floor 270 m below it
+local FLOOR_RING = 150
+function T.floorRef(p)
+  local r = surf(p.x, p.z)
+  for i = 0, 7 do
+    local a = i * math.pi / 4
+    r = math.max(r, surf(p.x + FLOOR_RING * math.cos(a), p.z + FLOOR_RING * math.sin(a)))
+  end
+  return r
+end
+
 -- The gorge floor nearest a planned point. Samples a grid within r; a "channel" sample is one with ground at least
 -- WALL m higher SPAN m away on both sides along some axis, and no more than DEPTH m above the lowest sample.
 -- The channel sample nearest the planned point wins, refined to the lowest ground within 150 m of it.
@@ -264,7 +286,7 @@ function T.floorTick(_, t)
     local p = u:getPoint()
     local n = u:getName()
     local d = N.dist(p, S.tgt)
-    local agl = p.y - h(p.x, p.z)
+    local agl = p.y - T.floorRef(p)
     if d <= C.DET_R and d > C.POP_R and agl > C.FLOOR_FT * FT then
       S.high[n] = (S.high[n] or 0) + 1
       if S.high[n] == 1 and C.WARN and not S.warned[n] and not S.detected then
@@ -422,8 +444,9 @@ function T.timeCheck()
   elseif S.breach then state = "Door down, " .. math.max(0, math.floor(S.sealAt - now + 0.5)) .. " s to put a bomb through."
   elseif now < C.HAMMER then state = "HAMMER hits Red's fighter control at " .. N.hms(C.HAMMER) .. "L. Don't arrive early."
   else state = "HAMMER is in. " .. C.SOUTH_BASE .. " alert held on the ground until about " .. N.hms(C.HAMMER + C.REPAIR) .. "L." end
-  N.msg(string.format("Time %s\nTOT %s (%s), window +/-%d s\n%s\nRadar floor %d ft AGL: %s. Climb-out SAMs: %s.",
-    N.clock(now), N.clock(C.TOT), d >= 0 and ("in " .. N.mmss(d):sub(2)) or (N.mmss(-d):sub(2) .. " ago"), C.WINDOW, state,
+  N.msg(string.format("Time %s\nPush %s, TOT %s (%s), window +/-%d s\n%s\nRadar floor %d ft AGL: %s. Climb-out SAMs: %s.",
+    N.clock(now), C.PUSH_T and N.clock(C.PUSH_T) or "-", N.clock(C.TOT),
+    d >= 0 and ("in " .. N.mmss(d):sub(2)) or (N.mmss(-d):sub(2) .. " ago"), C.WINDOW, state,
     C.FLOOR_FT, S.detected and "DETECTED" or "not seen", S.samsLive and "UP" or "quiet"), 15)
 end
 
@@ -460,9 +483,21 @@ function N.onAllDown() T.summary() end
 
 ------------------------------------------------------------------ init
 function T.init()
+  if C.CARRIER then N.rec.carrier = C.CARRIER end
   T.spawnAll()
   local now = timer.getAbsTime()
   local function at(abs, fn) timer.scheduleFunction(function() fn() return nil end, nil, timer.getTime() + math.max(1, abs - now)) end
+
+  -- MAGIC calls the push: leave PUSH now at the planned speeds and the TGT waypoint comes up at TOT
+  if C.PUSH_T then
+    at(C.PUSH_T - 60, function()
+      N.msg("MAGIC: Enfield, one minute to push. Push " .. N.hms(C.PUSH_T) .. "L, TOT " .. N.hms(C.TOT) .. "L.", 12)
+    end)
+    at(C.PUSH_T, function()
+      N.msg("MAGIC: Enfield, PUSH PUSH. TOT " .. N.hms(C.TOT) .. "L. Springfield, push in " .. C.SPRING_DELAY .. ".", 15)
+    end)
+    at(C.PUSH_T + C.SPRING_DELAY, function() N.msg("MAGIC: Springfield, PUSH PUSH.", 12) end)
+  end
 
   at(C.HAMMER, function()
     S.hammer = true

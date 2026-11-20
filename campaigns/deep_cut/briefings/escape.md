@@ -2,7 +2,7 @@
 
 # Operation Deep Cut: Escape
 
-F-14A Tomcat · 1 player, or 2 with a RIO · Caucasus · escape and evasion in a stolen jet · cold start at Senaki-Kolkhi, recovery aboard CVN-74
+F-14A Tomcat · 1 player, or 2 with a RIO · Caucasus · escape and evasion in a stolen jet · cold start at Senaki-Kolkhi, recovery aboard {{ carrier_short }}{% if supercarrier %} (Supercarrier){% endif %}
 
 <p class="small">Nobody briefs an escape. In the story, all you have is what HATCHET whispered to you on the ramp and what you remember. This sheet is for you, the player.</p>
 
@@ -12,7 +12,7 @@ F-14A Tomcat · 1 player, or 2 with a RIO · Caucasus · escape and evasion in a
 |---|---|---|---|
 | Start | **{{ start }} local**, cold on the ramp | Seen by | about **{{ discover }}**, or {{ notice }} s after you take off |
 | Jet | Red's F-14A, readied for a ferry flight: full fuel, two tanks, **gun only** | Chasing | Two MiG-29s off Kutaisi, about {{ react_min }} min after you're seen |
-| Home | CVN-74 · 127.5 · TACAN 74X · ICLS 11 | Help | CHEVY CAP at the coast, ARCO, MAGIC |
+| Home | {{ carrier_short }} · 127.5 · TACAN 74X · ICLS 11 | Help | CHEVY CAP at the coast, ARCO, MAGIC |
 | Code word | **{{ code }}**: check in with MAGIC once airborne | ID zone | {{ id_nm }} nm from Mother: unknown jets get intercepted; the fleet fires inside {{ fleet_nm }} nm |
 
 </div>
@@ -58,7 +58,7 @@ Start the Tomcat, get airborne and get home to Mother.
 | Partial | You eject over the water: the Navy picks you up, but the jet is lost |
 | Failure | You're caught before you get airborne, you go down over land again, or the fleet shoots you down |
 
-1 player, cold start. In multiplayer a second player can take the RIO seat; in single player Jester is your RIO.
+1 player, cold start, in a client slot. In multiplayer a second player can take the RIO seat; in single player Jester is your RIO.{% if supercarrier %} This version recovers aboard the Supercarrier ({{ carrier }}): you need the Supercarrier module to catch a wire. Without it, fly {{ miz | replace("_SC", "") }}.{% endif %}
 <!-- /ingame -->
 
 <!-- task -->
@@ -74,7 +74,7 @@ Start the Tomcat, get airborne and get home to Mother.
 | MAGIC | E-2C | 255.0 AM |
 | CHEVY | Hornet CAP at the coast | MAGIC commits it |
 | ARCO | S-3B tanker | 251.0 AM, TACAN 60Y |
-| MOTHER | CVN-74 Stennis | 127.5, TACAN 74X, ICLS 11 |
+| MOTHER | {{ carrier }} | 127.5, TACAN 74X, ICLS 11 |
 
 F10 > Escape: **Status** (seen or not, identified or not, fighters, CAP), **Check in with MAGIC ({{ code }})** (airborne only), **Mission summary now**.
 <!-- /task -->
@@ -83,7 +83,7 @@ F10 > Escape: **Status** (seen or not, identified or not, fighters, CAP), **Chec
 
 <div class="kicker">Map</div>
 
-![The way home](Operation_Deep_Cut_Escape_theater.png){: .medium }
+![The way home]({{ stem }}_theater.png){: .medium }
 
 <div class="keep" markdown="1">
 

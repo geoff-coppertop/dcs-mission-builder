@@ -267,6 +267,7 @@ function N.onAllDown()
 end
 
 function T.init()
+  if C.CARRIER then N.rec.carrier = C.CARRIER end
   for _, g in ipairs(C.FIELD_AD) do N.setAD(g, false) end
   timer.scheduleFunction(function()
     if not S.found then T.discover(S.airborne and "the takeoff" or "a guard on his rounds") end

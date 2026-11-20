@@ -2,7 +2,7 @@
 
 # Operation Deep Cut{% if hard %} (hard){% endif %}
 
-F/A-18C · 1–4 players · Caucasus · low-level gorge strike · cold start and recovery aboard CVN-74
+F/A-18C · 1–4 players · Caucasus · low-level gorge strike · cold start and recovery aboard {{ carrier_short }}{% if supercarrier %} (Supercarrier){% endif %}
 
 <div class="glance" markdown="1">
 
@@ -11,7 +11,7 @@ F/A-18C · 1–4 players · Caucasus · low-level gorge strike · cold start and
 | TOT | **{{ tot }} local** / {{ tot_z }}Z | Target | Tunnel portal on the Enguri gorge floor, near Khaishi |
 | Window | {{ win_on }}–{{ win_off }} (±{{ window }} s) | Attack | Breach the blast door, then a second bomb through it within {{ kill_window }} s |
 | Radar floor | {{ floor_ft }} ft AGL from Jvari to {{ pop_nm }} nm out | Threats | Guns and MANPADS in the gorge; {{ sam_names | join(" and ") }} at the climb-out; fighters |
-| Mother | CVN-74 · 127.5 · TACAN 74X · ICLS 11 | Support | HAMMER (TLAMs), HATCHET (laser), CHEVY (CAP), ARCO, MAGIC |
+| Mother | {{ carrier_short }} · 127.5 · TACAN 74X · ICLS 11 | Support | HAMMER (TLAMs), HATCHET (laser), CHEVY (CAP), ARCO, MAGIC |
 
 </div>
 
@@ -43,6 +43,12 @@ At **{{ hammer }}**, {{ hammer_lead }} minutes before TOT, HAMMER, a salvo of To
 - **On time** ({{ win_on }}–{{ win_off }}): the breaching bomb lands while Kutaisi has no fighter control and before Red's air defence has worked out what HAMMER was for. The climb-out SAMs come up {{ react }} seconds after the first bomb lands on the portal. That is your time to get back down into the gorge.
 - **Early** (before {{ win_on }}): if a bomb lands before HAMMER, Kutaisi's fighter control is still working and its alert launches straight away.
 - **Late** (after {{ win_off }}): Red's air defence is fully alerted by HAMMER. The climb-out SAMs are up at **{{ sam_up }}** ({{ sam_up_s }} s after TOT) whether or not you have attacked, and every minute you spend in the gorge brings the Kutaisi fighters closer.
+
+## Getting there on time
+
+MAGIC calls the push. You'll hear "one minute to push", then **PUSH PUSH** at **{{ push }}** for Enfield and at {{ spring_push }} for Springfield. Leave PUSH (waypoint {{ push_wp }}) on the call and fly the planned speeds on the route card; it gives the planned time at every waypoint to the target.
+
+To let the jet do the sums, set the Hornet's TOT function: on the HSI DATA page, on the waypoint sequence (SEQUFC) page, enter TOT **{{ tot_z }}** Zulu (local time minus 4 hours on this map; Springfield {{ spring_tot_z }}) and set TGT to **waypoint {{ tgt_wp }}**. Leave the ground speed entry blank. The HSI then shows the ground speed you need to make the TOT. Fly that, and step through the waypoints in order: set the HSI to auto-sequence, or step it by hand at each one. F10 > Deep Cut > Time check gives the push time, the TOT and how long is left.
 
 ## The attack
 
@@ -88,7 +94,7 @@ The summary after the last jet is down gives you a score out of 100.
 
 ## Players
 
-Enfield 1-1 is flyable in single player; one Hornet can win this on its own. In multiplayer, Enfield and Springfield are two pairs of strike Hornets. All four start cold on the deck.
+Every slot is a client slot: in single player pick one (Enfield 1-1 is the lead), and one Hornet can win this on its own. In multiplayer, Enfield and Springfield are two pairs of strike Hornets. All four start cold on the deck.{% if supercarrier %} This version uses the Supercarrier ({{ carrier }}): everyone flying needs the Supercarrier module to start on the deck or catch a wire. Without it, fly the Stennis version, {{ miz | replace("_SC", "") }}.{% endif %}
 <!-- /ingame -->
 
 <!-- task -->
@@ -99,9 +105,10 @@ Enfield 1-1 is flyable in single player; one Hornet can win this on its own. In 
 | Event | Local |
 |---|---|
 | Mission start, cold on the deck | {{ start }} |
+| **Push: Enfield** (Springfield {{ spring_push }}) | **{{ push }}** |
 | HAMMER: TLAMs hit Red's air defence command post and fighter control | {{ hammer }} |
 | Window opens | {{ win_on }} |
-| **TOT: blast door** | **{{ tot }}** |
+| **TOT: blast door** ({{ tot_z }}Z; Springfield {{ spring_tot }}) | **{{ tot }}** |
 | Window closes | {{ win_off }} |
 | Climb-out SAMs up if nothing has woken them | {{ sam_up }} |
 | Kutaisi alert airborne on the backup control (no earlier trigger) | {{ south_up }} |
@@ -119,7 +126,7 @@ Enfield 1-1 is flyable in single player; one Hornet can win this on its own. In 
 | CHEVY | Hornet CAP over the water, committed by MAGIC | 251.0 AM |
 | MAGIC | E-2C, calls the floor, the SAMs and the fighters | 255.0 AM |
 | ARCO | S-3B tanker | 251.0 AM, TACAN 60Y |
-| MOTHER | CVN-74 Stennis | 127.5, TACAN 74X, ICLS 11 |
+| MOTHER | {{ carrier }} | 127.5, TACAN 74X, ICLS 11 |
 
 F10 > Deep Cut: **Time check** (TOT, HAMMER, floor and SAM state), **Target coordinates** (the portal's exact position), **Hatchet: laser on the door**, **Hatchet: terminate**, **Mission summary now**.
 
@@ -130,7 +137,7 @@ F10 > Deep Cut: **Time check** (TOT, HAMMER, floor and SAM state), **Target coor
 
 <div class="kicker">Map 1</div>
 
-![Theater map](Operation_Deep_Cut{% if hard %}_Hard{% endif %}_theater.png){: .medium }
+![Theater map]({{ stem }}_theater.png){: .medium }
 
 <p class="small">Coastline is approximate (about 1 km resolution). Courses are true. Red's sites are drawn at their planned points.</p>
 
@@ -138,7 +145,7 @@ F10 > Deep Cut: **Time check** (TOT, HAMMER, floor and SAM state), **Target coor
 
 <div class="kicker">Map 2</div>
 
-![The gorge](Operation_Deep_Cut{% if hard %}_Hard{% endif %}_gorge.png){: .medium }
+![The gorge]({{ stem }}_gorge.png){: .medium }
 
 <p class="small">The checkpoints follow the river from Jvari and the dam; above the dam they are estimates. At mission start the script finds the real gorge floor within each dotted ring with DCS's own terrain and places the portal, guns and MANPADS there, and the SAMs on the highest ground in theirs. Fly the gorge you see, not the line.</p>
 
@@ -154,7 +161,7 @@ F10 > Deep Cut: **Time check** (TOT, HAMMER, floor and SAM state), **Target coor
 | {{ r.wp }} | {{ r.name }} | {{ r.coords }} | {{ r.alt }} | {{ r.leg }} | {{ r.course }} | {{ r.time }} |
 {% endfor %}
 
-<p class="small">Springfield's TGT time is locked 45 seconds after Enfield's. The TGT coordinates are the planned point: use the exact ones the mission gives you. Planned target: MGRS {{ tgt_mgrs }}, {{ tgt_ddm }}.</p>
+<p class="small">Times are Enfield's: Springfield adds {{ spring_delay }} seconds to every one, and its TGT time is locked {{ spring_delay }} seconds after Enfield's. The TGT coordinates are the planned point: use the exact ones the mission gives you. Planned target: MGRS {{ tgt_mgrs }}, {{ tgt_ddm }}.</p>
 
 </div>
 

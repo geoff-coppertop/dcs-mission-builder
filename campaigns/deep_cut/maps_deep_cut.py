@@ -134,7 +134,8 @@ def draw(miz):
         label(ax, lo, la, p["name"], BLUE, dx=7, dy=-7, size=6.6, weight="bold" if p["name"] == "TGT" else "normal")
     c0 = en[0]["ll"]
     ax.plot(c0[1], c0[0], "D", ms=5.5, color=INK, zorder=9)
-    label(ax, c0[1], c0[0], "CVN-74\nTACAN 74X", INK, dy=-12, ha="center", va="top", size=6.4)
+    cv_name = re.search(r'CARRIER = "([^"]+)"', c).group(1).split(" ")[0]
+    label(ax, c0[1], c0[0], f"{cv_name}\nTACAN 74X", INK, dy=-12, ha="center", va="top", size=6.4)
     scale_bar(ax, ext, 20)
     north_arrow(ax, ext)
     ax.legend(handles=[Line2D([], [], color=BLUE, lw=2, label="Strike route (solid in, dashed out)"),
