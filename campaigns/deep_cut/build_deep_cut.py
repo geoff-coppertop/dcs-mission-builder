@@ -52,7 +52,7 @@ PUSH = (42.320, 41.250)            # over the sea, short of the coast
 CVN_START = (42.150, 39.900)       # ~75 nm off the coast, steaming west: ~110 nm out by recovery (stand-off from coastal missiles)
 CAP = (42.300, 41.150)             # CHEVY's station, over the water off the Enguri mouth
 TANKER = (42.300, 40.950)
-NORTH_SPAWN = (43.150, 42.450)     # over the main range
+NORTH_PATROL = (43.600, 42.100)    # standing patrol north of the main range, ~39 nm N of the portal, clear of Elbrus
 
 
 def lua_pt(p):
@@ -138,7 +138,8 @@ def build(key, sc=False):
 
     kutaisi = b.terrain.airports["Kutaisi"].position
     fighters("Red South", v["south"], kutaisi.point_from_heading(300, 6000), 1500, pts["RIVER"], 60_000)
-    fighters("Red North", v["north"], P(*NORTH_SPAWN), 5000, pts["GATE"], 50_000)
+    # the patrol is on station all along; it is only spawned (late activation) when GCI vectors it south
+    fighters("Red North", v["north"], P(*NORTH_PATROL), 6000, pts["GATE"], 50_000)
 
     # ------------------------------------------------------------ Red ground (spawned by the script)
     def site(name, kind, ll_or_off, r, units, heading=0):

@@ -110,7 +110,7 @@ def draw(miz):
         if s[1] == "sam":
             r = max(rng(t) for t in s[5])
             ring(ax, site_ll(s), r, color=ORANGE, lw=0.9, zorder=4)
-    for gn, col, lab in (("Red South", RED, "Kutaisi alert"), ("Red North", RED, "Northern alert")):
+    for gn, col, lab in (("Red South", RED, "Kutaisi alert"), ("Red North", RED, "Northern patrol")):
         r = g[gn]["route"]
         a, b2 = r[0]["ll"], r[1]["ll"]
         ax.plot(a[1], a[0], "^", ms=6, color=col, zorder=8)

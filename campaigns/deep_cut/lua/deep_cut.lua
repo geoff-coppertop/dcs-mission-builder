@@ -249,9 +249,10 @@ local function launch(which, why)
   if S[which] then return end
   S[which] = { t = timer.getAbsTime(), why = why }
   N.activate(g)
-  local kind = which == "south" and (C.SOUTH_KIND .. " off " .. C.SOUTH_BASE) or (C.NORTH_KIND .. " from the north")
-  N.msg("MAGIC: Pop-up group, " .. (which == "south" and (C.SOUTH_KIND .. " off " .. C.SOUTH_BASE) or
-        (C.NORTH_KIND .. " from the north, over the main range")) .. ", hot toward the gorge mouth. " .. why .. ".", 20)
+  local kind = which == "south" and (C.SOUTH_KIND .. " off " .. C.SOUTH_BASE) or (C.NORTH_KIND .. " on patrol north of the main range")
+  N.msg((which == "south" and ("MAGIC: Pop-up group, " .. C.SOUTH_KIND .. " off " .. C.SOUTH_BASE) or
+        ("MAGIC: The northern patrol, " .. C.NORTH_KIND .. " about 40 nm north over the main range, has turned south")) ..
+        ", hot toward the gorge mouth. " .. why .. ".", 20)
   N.capThreat(kind .. ", heading for the gorge mouth")
 end
 
@@ -263,7 +264,7 @@ function T.detected(name, agl)
   if S.detected then return end
   S.detected = { who = name, t = timer.getAbsTime(), agl = agl }
   N.msg(string.format("MAGIC: %s was seen above the floor at %d ft AGL. Red's radar has the package.\n" ..
-        "Expect the climb-out SAMs up and fighters from the north.%s", name, math.floor(agl / FT + 0.5),
+        "Expect the climb-out SAMs up and the northern patrol in about 6 minutes.%s", name, math.floor(agl / FT + 0.5),
         (not S.hammer) and (" HAMMER hasn't hit yet: expect the " .. C.SOUTH_BASE .. " alert too.") or ""), 20)
   T.samsLive("package detected")
   T.scramble("north", "Red saw the package", C.ALERT_REACT)
@@ -419,7 +420,7 @@ function T.summary()
   if S.samsLive then alerts[#alerts + 1] = "climb-out SAMs up: " .. S.samWhy end
   if S.south then alerts[#alerts + 1] = C.SOUTH_BASE .. " alert launched" end
   local cap = N.capSummary()
-  if S.north then alerts[#alerts + 1] = "northern alert launched" end
+  if S.north then alerts[#alerts + 1] = "northern patrol committed" end
   trigger.action.setUserFlag(C.OUTCOME_FLAG, ({ TEXTBOOK = 1, SUCCESS = 2, PARTIAL = 3, FAILURE = 4 })[sc.grade])
   trigger.action.setUserFlag(C.SCORE_FLAG, sc.total)
   local rescue, onLand = N.rescue(C.NEXT_ESCAPE)

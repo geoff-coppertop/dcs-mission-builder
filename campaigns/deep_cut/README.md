@@ -34,7 +34,7 @@ warns at 20 nm and the fleet shoots inside 10 nm unless you authenticate before 
 ## What drives it
 
 - **Radar floor.** From the gorge mouth to 3.8 nm from the portal, any player jet more than the floor height above
-  the surface for a few seconds is seen: the climb-out SAMs come up, the northern alert launches, and before HAMMER the
+  the surface for a few seconds is seen: the climb-out SAMs come up, the northern patrol (about 40 nm north) is vectored south, and before HAMMER the
   Kutaisi alert does too. Height is measured from the highest surface within 150 m, taking the water level over the
   reservoir (`land.getSurfaceHeightWithSeabed`), so the dam's crest and the lake count, not the gorge 270 m below the
   dam or the reservoir's bed.

@@ -22,7 +22,7 @@ Red has dug a hardened store into the wall of the upper Enguri gorge, near Khais
 
 **Why not Tomahawks.** The portal faces down a near-vertical wall into a gorge that bends twice below it; a cruise missile can't make the last turn and dive without hitting the rock. The door also needs two bombs seconds apart, the second guided only after someone has seen the first land. That takes aircrew and a laser.
 
-The gorge is the only approach. Red's radars on the ridges watch everything above the rim, and the high ground either side of the portal holds {{ sam_names | join(" and ") }} batteries, sitting quiet with their radars off until Red's air defence commander wakes them. Guns and MANPADS teams line the floor of the upper gorge. Two fighter alerts cover the area: {{ south_kind }} at Kutaisi to the south-east, and {{ north_kind }} north of the main range.
+The gorge is the only approach. Red's radars on the ridges watch everything above the rim, and the high ground either side of the portal holds {{ sam_names | join(" and ") }} batteries, sitting quiet with their radars off until Red's air defence commander wakes them. Guns and MANPADS teams line the floor of the upper gorge. Two fighter pairs cover the area: {{ south_kind }} on alert at Kutaisi to the south-east, and {{ north_kind }} on patrol about 40 nm north, over the far side of the main range. The patrol reaches the gorge about 6 minutes after Red's radar sees you; Kutaisi's alert needs its fighter control.
 
 ## Mission
 
@@ -32,7 +32,7 @@ Destroy the store by putting two laser-guided bombs into the tunnel portal: the 
 
 Coast in at the Enguri mouth below {{ floor_ft }} ft, follow the river {{ coast_gate_nm }} nm to the gorge mouth at **Jvari (GATE)**, and fly up the gorge past the dam and along the reservoir, about {{ canyon_nm }} nm, to the portal. That is about {{ run_min }} minutes from the coast at 470 kt, and from the GATE on you are inside Red's radar coverage.
 
-**The radar floor.** From the GATE until you are {{ pop_nm }} nm from the portal, any jet more than **{{ floor_ft }} ft above the ground** for {{ grace }} second{{ "s" if grace > 1 }} is seen. {% if warn %}MAGIC warns you the first time you go above it. {% endif %}If anyone is seen, Red knows the package is coming: the climb-out SAMs come up at once, the northern alert launches, and if HAMMER hasn't hit yet, so does Kutaisi. Inside {{ pop_nm }} nm of the portal you may climb for the attack: Red will know where you are when the first bomb lands anyway.
+**The radar floor.** From the GATE until you are {{ pop_nm }} nm from the portal, any jet more than **{{ floor_ft }} ft above the ground** for {{ grace }} second{{ "s" if grace > 1 }} is seen. {% if warn %}MAGIC warns you the first time you go above it. {% endif %}If anyone is seen, Red knows the package is coming: the climb-out SAMs come up at once, the northern patrol is turned south, and if HAMMER hasn't hit yet, so does Kutaisi. Inside {{ pop_nm }} nm of the portal you may climb for the attack: Red will know where you are when the first bomb lands anyway.
 
 This applies to every Blue jet in the package.
 
@@ -184,5 +184,5 @@ The mission's commands are in the radio menu, under **F10. Other** (not the F10 
 {% if hard %}
 ## Hard variant
 
-The floor is {{ floor_ft }} ft with no warning and {{ grace }} second{{ "s" if grace > 1 }} of grace, the window is ±{{ window }} s, the door has to be hit within {{ hit_r }} m and the kill made within {{ kill_window }} s. The climb-out SAMs are {{ sam_names | join(" and ") }}, the gorge guns include a ZSU-23-4, Kutaisi's backup fighter control is up after {{ repair_min }} minutes, and the northern alert is {{ north_kind }}.
+The floor is {{ floor_ft }} ft with no warning and {{ grace }} second{{ "s" if grace > 1 }} of grace, the window is ±{{ window }} s, the door has to be hit within {{ hit_r }} m and the kill made within {{ kill_window }} s. The climb-out SAMs are {{ sam_names | join(" and ") }}, the gorge guns include a ZSU-23-4, Kutaisi's backup fighter control is up after {{ repair_min }} minutes, and the northern patrol is {{ north_kind }}.
 {% endif %}
