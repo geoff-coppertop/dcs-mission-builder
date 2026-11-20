@@ -69,7 +69,7 @@ This is the last mission on this branch of the campaign.
 
 Secondary objective, **clean recovery**: every jet that launches traps aboard Mother with at least about 2,000 lb of fuel, and nobody is lost.
 
-1 or 2 players, cold start on the deck. Enfield 1-1 is flyable in single player.
+1 or 2 players, cold start on the deck. Both slots are client slots: in single player pick Enfield 1-1.
 <!-- /ingame -->
 
 <div class="keep" markdown="1">

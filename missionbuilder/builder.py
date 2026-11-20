@@ -115,7 +115,8 @@ class Builder:
         route: [(name, point, alt_ft, kts) ...]; MOTHER landing appended automatically."""
         g = self.m.flight_group_from_unit(self.usa, name, HN, self.cvn, maintask=task.GroundAttack,
                                           start_type=dcs.mission.StartType.Cold, group_size=2)
-        g.units[0].skill = Skill.Player
+        # both Client: a Player slot can't be taken in multiplayer, and Client slots are selectable in single player
+        g.units[0].skill = Skill.Client
         g.units[1].skill = Skill.Client
         for i, u in enumerate(g.units, start=1):
             u.name = f"{name} 1-{i}"

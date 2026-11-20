@@ -75,7 +75,7 @@ CVN_RECOVERY = CVN_START.point_from_heading(270, CVN_SPEED_KMH * 1000 * RECOVERY
 enfield = m.flight_group_from_unit(usa, "Enfield", FA_18C_hornet, cvn,
                                    maintask=task.GroundAttack,
                                    start_type=dcs.mission.StartType.Cold, group_size=2)
-enfield.units[0].skill = Skill.Player      # flyable in single player; becomes a client slot in MP
+enfield.units[0].skill = Skill.Client      # Client: Player slots can't be taken in MP; Client slots work in single player
 enfield.units[1].skill = Skill.Client      # second human in MP (absent in SP)
 enfield.units[0].name = "Enfield 1-1"
 enfield.units[1].name = "Enfield 1-2"

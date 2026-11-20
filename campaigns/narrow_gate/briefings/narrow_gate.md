@@ -84,7 +84,7 @@ This is the first mission of a short campaign. The summary after recovery names 
 
 Secondary objective, **clean recovery**: every jet that launches traps aboard Mother with at least about 2,000 lb of fuel (18% internal), and nobody is lost.
 
-1 or 2 players, cold start on the deck. Enfield 1-1 is flyable in single player; Enfield 1-2 joins in multiplayer.
+1 or 2 players, cold start on the deck. Both slots are client slots: in single player pick Enfield 1-1; in multiplayer the second player takes Enfield 1-2.
 <!-- /ingame -->
 
 <div class="pagebreak"></div>
